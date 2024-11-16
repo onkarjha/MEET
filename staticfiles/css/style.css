@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=SUSE:wght@500..800&display=swap');
+
+:root {
+--p:#7a8afd;
+--h:#d5d9f4;
+--h:#7a8afd4d;
+--fc:#7a7a7a;
+--hc:#222;
+--l:#f1f1f1;
+--sd:#0000000d 0 6px 24px 0px,#00000014 0 0 0 1px
+}
+
+* {
+margin:0;
+padding:0;
+box-sizing:border-box;
+color:#222;
+font-family:"SUSE", sans-serif;
+}
+
+::selection {
+background:#222;
+color:#fff
+}
+
+html {
+scroll-behavior:smooth
+}
+
+body {
+
+transition:.5s ease;
+background:#fff;
+background:#fafafa;
+color:#333;
+font-size:1rem
+}
+
+
+h1,h2,h3,h4,h5,h6 {
+color:var(--hc)!important
+}
+
+p,span {
+color:var(--fc);
+font-size:18px;
+line-height:24px
+}
+.form_body{
+	background: url('/static/images/chat.jpg');
+	width: 100%;
+	height: 100vh;background-size: cover;
+	background-position: center;
+  background-position: center;
+  background-repeat: no-repeat;filter: blur(5px);
+
+
+}.signup_form,.login_form,.create_collab,.enter_collab{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50% , -50%);
+	width: 400px !important;;
+	max-width: 95%;
+	background-color: #fff;
+	padding: 30px;
+	
+}.login_>div,.signup_>div,.form-group{
+	display: flex;
+	flex-direction: column;
+	
+}.signup_form{
+	display: none;
+}
+.signup_form input,.login_form input,.create_collab input,.enter_collab input{
+	margin-top: 10px;
+	border: none;
+	outline: none;
+	background-color: transparent;
+	border:1px solid var(--l);
+	height: 40px;
+	padding: 0 15px;
+	font-size: 16px;
+	transition: .3s ease-in;
+}input:focus{
+	border-bottom: 1px solid var(--p);
+}.signup_form label,.login_form label,.create_collab label,.enter_collab label{
+	margin-top: 10px;;
+}input[type="submit"]{
+	margin-top: 10px;
+	border: none;
+	outline: none;
+	background: var(--p);
+	
+	height: 40px;
+	padding: 0 15px;
+	font-size: 16px;
+	transition: .3s ease-in;color:#fff;cursor: pointer;
+}.sign_{
+	display: flex;
+	margin-top: 10px;;
+}.f_pass{
+	margin-top: 10px;
+}
+.hide{
+	display: none;
+}.show{
+	display: block;
+}.mt10{
+	margin-top: 10px;
+}.btn{
+	border: none;
+	outline: none;
+	background: var(--p);
+	
+	height: 40px;
+	padding: 0 15px;
+	font-size: 16px;
+	transition: .3s ease-in;color:#fff;cursor: pointer;
+}.big{
+	font-size: 22px;
+	padding: 20px;
+	height: auto;
+}
+.hero {
+	background-image: url('/static/images/chat.jpg?'); /* Replace with your own background image */
+	background-size: cover;
+	background-position: center;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: relative;
+	color: white;
+	text-align: center;
+  }
+  
+  .hero-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+  }
+
+  /*******************************/
+  * {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	}
+	body {
+	height: 100vh;
+	width: 100%;
+	}
+	.tools {
+	border-radius: 5px;
+	border: 1px solid #efefef;
+	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+	position: absolute;
+	left: 20px; /* 10px from the left */
+	top: 50%; /* Center vertically */
+	transform: translateY(-50%); /* Adjust vertically by 50% of the element's height */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	}
+	.tools > div > i {
+	font-size: 30px;
+	color: #444;
+	}
+	.tools > div {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 60px;
+	width: 60px;float: left;
+	}/* Initially hide the .colors container */
+	.colors {
+	position: absolute;
+	width: 200px;
+	padding: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	background-color: #efefef;
+	left: 80px;
+	top: 50%; /* Adjust if needed */
+	transform: translateY(-50%); /* Centers it vertically */
+	}
+	/* Triangle mark on the left side of .colors */
+	.colors::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: -20px; /* Adjust this for the size of the triangle */
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid #efefef; /* Triangle color matches .colors background */
+	transform: translateY(-50%);
+	}.lines {
+	position: absolute;
+	width: 200px;
+	padding: 20px;
+	background-color: #efefef;
+	left: 80px;
+	top: 68%; /* Adjust if needed */
+	transform: translateY(-50%); /* Centers it vertically */
+	}
+	.lines>div{padding: 2px;text-align: center;
+	margin-top:5px;  margin-bottom:5px;
+	}
+	/* Triangle mark on the left side of .colors */
+	.lines::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: -20px; /* Adjust this for the size of the triangle */
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-top: 20px solid #efefef; /* Triangle color matches .colors background */
+	transform: translateY(-50%);
+	}
+	.colors>div{
+	height:30px;
+	width: 30px;
+	border-radius: 50px;
+	margin:5px;
+	padding: 5px;
+	}
+	.form-group{
+		align-items: start;
+	}
