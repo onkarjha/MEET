@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost']
 
 
 INSTALLED_APPS = [
@@ -30,6 +30,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'meet.urls'
@@ -99,7 +100,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+MEDIA_ROOT = '/media/'
 # Add this if you want to collect static files into a specific directory for production
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Adjust based on your project structure
