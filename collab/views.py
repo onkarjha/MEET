@@ -38,9 +38,9 @@ def check(request):
             id = request.GET.get('id', 0)
             pass_=request.GET.get('pass', 0)
             if(id!=0 and pass_!=0):
-                return render(request, 'id_pass.html',{'id':id,'pass':pass_})
+                return render(request, 'id_pass.html',{'id':id,'pass':pass_,'isLogged':isLogged})
             else:
-                return render(request, 'id_pass.html')
+                return render(request, 'id_pass.html',{'isLogged':isLogged})
         else:
             return redirect('../../auth/login') 
 def check4create(request):
@@ -72,7 +72,7 @@ def check4create(request):
     else:
         
         if (isLogged):
-            return render(request, 'create_collab.html', {})
+            return render(request, 'create_collab.html', {'isLogged':isLogged})
         else:
             return redirect('../../auth/login') 
 def host(request):

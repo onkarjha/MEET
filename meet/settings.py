@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost']
+ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost','127.0.0.1']
 
 
 INSTALLED_APPS = [
