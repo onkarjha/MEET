@@ -1,7 +1,7 @@
 asgiref==3.7.2
 attrs==23.2.0
 Babel==2.10.3
-bcc==0.29.1
+bcc
 blinker==1.7.0
 Brlapi==0.8.5
 certifi==2023.11.17
@@ -41,6 +41,7 @@ pillow==10.2.0
 ptyprocess==0.7.0
 pycairo==1.25.1
 pycups==2.0.1
+gunicorn
 Pygments==2.17.2
 PyGObject==3.48.2
 PyJWT==2.7.0
