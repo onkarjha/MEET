@@ -2,7 +2,7 @@ asgiref
 attrs
 Babel
 blinker
-Brlapi
+
 certifi
 chardet
 click
