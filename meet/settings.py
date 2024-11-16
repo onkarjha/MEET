@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['meet-82mk.onrender.com']
+ALLOWED_HOSTS = ['meet-82mk.onrender.com/']
 
 
 
@@ -107,7 +107,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+# On Render, we need to collect static files to this directory
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Add this if you want to collect static files into a specific directory for production
 STATICFILES_DIRS = [
     BASE_DIR / "static",  # Adjust based on your project structure
