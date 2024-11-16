@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      {% include 'head.html' %}
+      <title>Authentication</title>
+   
+   </head>
+   <body >
+      
+           <div class="form_body"></div>
+           
+          <div class="login_form">
+             <div class="login_details">
+               <img src="/static/images/logo.jpg" style="max-width: 100%;">
+               <h1>Login</h1>
+               <p class="text_log">Login now & start chatting!</p>
+                <form class="login_" >
+                  {% csrf_token %}
+                <div>
+                <label>Email</label>
+                   <input type="email" class="login_email" placeholder="Email" required name="email">
+                   </div>
+                   <div>
+                   <label>Password</label>
+                   <input type="password" class="login_pass" placeholder="Password" name="pass">
+                   </div>
+                   <div class="f_pass">
+                      <a href="#">Forgot Password?</a>
+                   </div>
+                   <input type="submit" class="login_btn" value="Log In">
+                </form>
+                <div class="sign_">
+                   <p>Don't have and account?</p> &nbsp;&nbsp;
+                   <a href="#" class="signup">Signup Now</a>
+                </div>
+             </div>
+          </div>
+          <div class="signup_form">
+             <div class="login_details">
+               <img src="/static/images/logo.jpg">
+               <h1>Sign Up</h1>
+               <p class="text_log">Your Friends are waiting!</p>
+                <form class="signup_">
+                  {% csrf_token %}
+                <div>
+                <label>Name</label>
+                   <input type="text" name="name" class="signup_name" placeholder="Name" required>
+                   </div>
+                   
+                   <div>
+                <label>Email</label>
+                    <input type="email" name="email" required class="signup_email" placeholder="Email" required>
+                    </div>
+                    <div>
+                     <label>Password</label>
+                        <input type="password" name="pass" class="signup_pass" required placeholder="Password">
+                        </div>
+                        <div>
+                           <label>Otp</label>
+                              <input type="number" name="otp" class="" required placeholder="OTP">
+                              </div>
+                   <button type="button" class="btn mt10 register_otp sign_otp_button">Get Otp</button>
+                   <input type="submit" class="login_btn hide sign_btn" value="Sign Up">
+                </form>
+                <div class="sign_">
+                   <p>Already have an account?</p> &nbsp;&nbsp;
+                   <a href="#" class="login">Login Now</a>
+                </div>
+             </div>
+          </div>
+       <script src="/static/js/script.js?v=-11"></script>
+   </body>
+</html>
