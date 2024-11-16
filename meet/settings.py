@@ -13,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['meet-82mk.onrender.com']
+ALLOWED_HOSTS = ['*']
 
 
 
