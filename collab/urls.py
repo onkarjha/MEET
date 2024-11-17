@@ -5,5 +5,6 @@ urlpatterns = [
     path('check/', views.check,name="check"),
     path('check_create/', views.check4create,name="check4create"),
      path('host/', views.host,name="host"),  # Use the correct view function name
+     path('chat/', views.chat, name='chat'),
     
 ]

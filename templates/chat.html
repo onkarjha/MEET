@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat and Audio</title>
+    <style>
+        #remoteVideo {
+            width: 100%;
+            height: auto;
+            border: 1px solid black;  /* Optional, for visibility */
+        }
+
+        #localVideo {
+            width: 100%;
+            height: auto;
+            border: 1px solid black; /* Optional, for visibility */
+        }
+    </style>
+</head>
+<body>
+    <textarea id="messages" readonly></textarea>
+    <input type="text" id="messageInput">
+    <button onclick="sendMessage()">Send Message</button>
+    <button onclick="startVideoAudio()">Start Video/Audio</button>
+    <video id="localVideo" autoplay muted></video>
+    <video id="remoteVideo" autoplay></video>
+
+    <script>
+        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+        const messages = document.getElementById('messages');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+
+        const peerConnection = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        // Handle incoming messages from the server
+        chatSocket.onmessage = async function (e) {
+            const data = JSON.parse(e.data);
+
+            if (data.message) {
+                messages.value += data.message + '\n';
+            }
+
+            if (data.signal) {
+                // Handle SDP signaling (Offer/Answer)
+                if (data.signal.sdp) {
+                    const remoteDescription = new RTCSessionDescription(data.signal.sdp);
+
+                    if (remoteDescription.type === 'offer') {
+                        console.log("Received offer, setting remote description and creating answer");
+                        await peerConnection.setRemoteDescription(remoteDescription);
+
+                        // Create an answer and send it back to the caller
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        chatSocket.send(JSON.stringify({ signal: { sdp: answer } }));
+                    } else if (remoteDescription.type === 'answer') {
+                        console.log("Received answer, setting remote description");
+
+                        // Avoid setting remote answer in the wrong signaling state
+                        if (peerConnection.signalingState === 'have-local-offer') {
+                            await peerConnection.setRemoteDescription(remoteDescription);
+                        } else {
+                            console.log("Skipping setting remote answer; wrong state:", peerConnection.signalingState);
+                        }
+                    }
+                }
+
+                // Handle ICE candidates
+                if (data.signal.candidate) {
+                    console.log("Received ICE candidate, adding to peer connection");
+                    try {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
+                    } catch (error) {
+                        console.log('Error adding ICE candidate:', error);
+                    }
+                }
+            }
+        };
+
+        // Send messages and ICE candidates
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            chatSocket.send(JSON.stringify({ 'message': messageInput.value }));
+            messageInput.value = '';
+        }
+
+        // Set up the video and audio stream and initiate the WebRTC connection
+        async function startVideoAudio() {
+            try {
+                // Get user media stream (video & audio)
+                const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localVideo.srcObject = localStream; // Show local video
+
+                // Add local tracks to the peer connection
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                // Create an offer to start the WebRTC connection
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
+                // Send the offer to the other peer
+                chatSocket.send(JSON.stringify({ signal: { sdp: offer } }));
+
+                // Wait for the local SDP to be set before sending ICE candidates
+                peerConnection.onicecandidate = function (event) {
+                    if (event.candidate) {
+                        chatSocket.send(JSON.stringify({ signal: { candidate: event.candidate } }));
+                    }
+                };
+
+            } catch (error) {
+                console.error('Error accessing media devices:', error);
+            }
+        }
+
+        // When remote tracks are added (e.g., remote video stream)
+        peerConnection.ontrack = function (event) {
+            const remoteStream = event.streams[0];
+            console.log("Received remote stream:", remoteStream); // Log the remote stream
+            if (remoteStream) {
+                remoteVideo.srcObject = remoteStream; // Set remote stream to the video element
+            }
+        };
+
+        // Handle ICE candidates (send candidates for the local peer)
+        peerConnection.onicecandidate = function (event) {
+            if (event.candidate) {
+                chatSocket.send(JSON.stringify({ signal: { candidate: event.candidate } }));
+            }
+        };
+    </script>
+</body>
+</html>

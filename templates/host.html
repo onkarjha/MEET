@@ -1,8 +1,7 @@
 <html lang="en">
    <head>
       {% include 'head.html' %}
-       <title>Collaborate - {{collab_id}}</title>
-    
+      <title>Collaborate - {{collab_id}}</title>
    </head>
    <body>
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
@@ -11,7 +10,6 @@
       <div title="circle"><i class="fi fi-sr-circle"></i></div>
       <div title="triangle"><i class="fi fi-sr-triangle"></i></div>
       <div title="pencil"><i class="fi fi-sr-pen-swirl"></i></div>
-     
       <div title="stroke">
          <i class="fi fi-sr-line-width"></i>
          <div class="lines" style="display: none;">
@@ -43,176 +41,60 @@
             <div style="background-color: #FFE347;" title="#FFE347"></div>
             <div style="background-color: #6457A6;" title="#6457A6"></div>
          </div>
-      </div> <div title="delete"><i class="fi fi-sr-trash"></i></div>
+      </div>
+      <div title="delete"><i class="fi fi-sr-trash"></i></div>
+      </div>
       <p class="fill" hidden>#ffffff</p>
       <p class="stroke" hidden>#000000</p>
       <p class="stroke_" hidden>1</p>
       <script>
-         $(document).ready(function () {
-          $(".colors>div").click(function(){
-         var c=$(this).attr("title");console.log(c);
-         $(".fill").text(c);
-          });          $(".lines>div").click(function(){
-         var c=$(this).attr("title");console.log(c);
-         $(".stroke_").text(c);
-          });
-            $(".tools > div").click(function () {
-               $(".tools > div").css({ "background": "#fff" });
-               $(this).css({ "background": "#efefef" });
-            });
-         });
+         const v='ws://' + window.location.host + '/ws/chat/';
+        
+         const chatSocket = new WebSocket(v);
+         const localVideo = document.getElementById('localVideo');
+         const remoteVideo = document.getElementById('remoteVideo');
+         const messages = document.getElementById('messages');
+ 
+         const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+         const peerConnection = new RTCPeerConnection(configuration);
+ 
          
-         var data;
-         const can = document.getElementById("canvas");
-         $(can).attr("height", window.innerHeight);
-         $(can).attr("width", window.innerWidth);
-         
-         const canvas = new fabric.Canvas(can, {
-            isDrawingMode: false,  // Initially drawing mode is off
-         });
-         
-         fabric.Object.ownDefaults.transparentCorners = false;
-         
-         $(".tools > div").click(function () {
-            data = $(this).attr("title");
-            var width = 200;
-            var height = 200;
-            var left = (window.innerWidth-200)/2;
-            var top = (window.innerHeight-200)/2;
-            var angle = 0;
-            var fill = $(".fill").text();
-            var stroke = $(".stroke").text();
-            var strokeWidth = parseInt($(".stroke_").text());
-         
-            var commonConfig = {
-               left: left,
-               top: top,
-               angle: angle,
-               fill: fill,
-               stroke: stroke,
-               strokeWidth: strokeWidth
-            };
-            canvas.isDrawingMode = false;
-            switch (data) {
-              
-               case "square":
-                canvas.isDrawingMode = false;
-                  canvas.add(new fabric.Rect({
-                     width: width,
-                     height: height,
-                     ...commonConfig
-                  }));
-                  break;
-         
-               case "circle":
-                  canvas.add(new fabric.Circle({
-                     radius: 50,
-                     ...commonConfig
-                  }));
-                  break;
-         
-               case "triangle":
-                  canvas.add(new fabric.Triangle({
-                     width: width,
-                     height: height,
-                     ...commonConfig
-                  }));
-                  break;
-         
-                  case "font":
-   canvas.add(new fabric.Textbox('Add Your Text Here', {
-      left: left,
-      top: top,
-      width: width,
-      fontSize: 30,
-      editable: true,
-      backgroundColor: 'transparent',
-      borderColor: 'gray',
-      fontFamily: 'Courier Prime', // Custom font
-      fill: 'black'
-   }));
-   break;
-
-         
-               case "pencil":
-                  canvas.isDrawingMode = true;
-                  const pencilBrush = new fabric.PencilBrush(canvas);
-                  pencilBrush.color = $(".stroke").text();
-                  pencilBrush.width = parseInt($(".stroke_").text());
-                  canvas.freeDrawingBrush = pencilBrush;
-         
-                  break;
-                  case "fill":
-                    $(".colors").toggle();
-                    break;
-                    case "stroke":
-                    $(".lines").toggle();
-                    break;
-                    case "delete":
-   var selectedObject = canvas.getActiveObject();
-   if (selectedObject) {
-       canvas.remove(selectedObject);
-       canvas.discardActiveObject();
-       canvas.renderAll();
-   } else {
-       alert("No object selected for deletion.");
-   }
-   break;
-
-            }
-         });
-         
-         canvas.on({
-            'object:moving': onChange,
-            'object:scaling': onChange,
-            'object:rotating': onChange,
-            'object:skewing': onChange,
-         });
-         
-         const hit = new fabric.Circle({
-            radius: 5,
-            originX: 'center',
-            originY: 'center',
-            opacity: 0.5,
-         });
-         
-         function onChange({ target }) {
-            target.setCoords();
-            const ctx = canvas.getTopContext();
-            canvas.clearContext(ctx);
-            canvas.forEachObject((obj) => {
-               if (obj === target) {
-                  obj.set('opacity', 1);
-                  return;
-               }
-               const intersection = fabric.Intersection.intersectPolygonPolygon(
-                  target.getCoords(true),
-                  obj.getCoords(true)
-               );
-         
-               hit.set({ fill: obj.fill });
-               if (
-                  intersection.status === 'Intersection' ||
-                  intersection.status === 'Coincident' ||
-                  obj.isContainedWithinObject(target, true) ||
-                  target.isContainedWithinObject(obj, true)
-               ) {
-                  obj.set('opacity', 1);
-                  ctx.save();
-                  ctx.transform(...canvas.viewportTransform);
-                  hit.transform(ctx);
-                  intersection.points.forEach(({ x, y }) => {
-                     ctx.save();
-                     ctx.translate(x, y);
-                     hit._render(ctx);
-                     ctx.restore();
-                  });
-                  ctx.restore();
-               } else {
-                  obj.set('opacity', 1);
-               }
-            });
+         chatSocket.onmessage = function(e) {
+            console.log(e);
+             const data = JSON.parse(e.data);
+             if (data.message) {
+                 console.log(data);
+             }
+             if (data.signal) {
+                 console.log("sig");
+                 if (data.signal.sdp) {
+                     peerConnection.setRemoteDescription(new RTCSessionDescription(data.signal.sdp));
+                 } else if (data.signal.candidate) {
+                     peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
+                 }
+             }
+         };
+         function sendMessage(data) {
+             chatSocket.send(JSON.stringify(data));
+            
          }
-      </script>
+ 
+         /*
+         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
+             localVideo.srcObject = stream;
+             stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
+         });
+ 
+         peerConnection.onicecandidate = function(event) {
+             if (event.candidate) {
+                 chatSocket.send(JSON.stringify({ 'signal': { 'candidate': event.candidate } }));
+             }
+         };
+ 
+         peerConnection.ontrack = function(event) {
+             remoteVideo.srcObject = event.streams[0];
+         };*/
+     </script>
+      {% include 'footer.html' %}
    </body>
 </html>

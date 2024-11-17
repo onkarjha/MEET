@@ -1,7 +1,8 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse
 from .models import *
-
+def chat(request):
+    return render(request, 'chat.html')
 def check(request):
     isLogged = request.session.get('isLogged', False)
     

@@ -1,14 +1,15 @@
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# daphne -b 0.0.0.0 -p 8000 meet.asgi:application
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost','127.0.0.1']
+ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost','127.0.0.1','*']
 
 
 INSTALLED_APPS = [
@@ -19,7 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'login',
-    'collab'
+    'collab',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -32,7 +34,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-
+ASGI_APPLICATION = 'meet.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("127.0.0.1", 6379)],  # Ensure Redis is running
+        },
+    },
+}
 ROOT_URLCONF = 'meet.urls'
 
 TEMPLATES = [
