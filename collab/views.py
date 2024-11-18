@@ -78,4 +78,4 @@ def check4create(request):
             return redirect('../../auth/login') 
 def host(request):
     print(request.session.get('collab_id', False))
-    return render(request,"host.html",{'collab_id':request.session.get('collab_id', False)})
+    return render(request,"host.html",{'collab_id':request.session.get('collab_id', False),'sender':request.session.get('lemail', False)})

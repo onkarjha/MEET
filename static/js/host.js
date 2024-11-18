@@ -25,6 +25,26 @@ const canvas = new fabric.Canvas(can, {
 fabric.Object.ownDefaults.transparentCorners = false;
 
 $(".tools > div").click(function () {
+
+
+
+
+   var collab_id=$(".collab_id").text();
+   var sender=$(".sender").text();
+   if(sender=="False"){
+      alert("You are not logged in!");
+      window.location.href=window.location.protocol+"//"+window.location.host+'/auth/login';
+      return;
+   }if(collab_id=="False"){
+      alert("Please Provide Collab ID and Password to join!");
+      window.location.href=window.location.protocol+"//"+window.location.host+'/collab/check';
+      return;
+   }
+  
+
+
+
+
    data = $(this).attr("title");
    var width = 200;
    var height = 200;
@@ -55,7 +75,7 @@ $(".tools > div").click(function () {
          }));
 
 
-         sendMessage({ 'message':{ width: width, height: height, ...commonConfig },
+         sendMessage({ 'message':{ collab_id:collab_id,sender:sender,width: width, height: height, ...commonConfig },
          'shape':data,
          });
 
@@ -68,6 +88,11 @@ $(".tools > div").click(function () {
             radius: 50,
             ...commonConfig
          }));
+
+
+         sendMessage({ 'message':{ collab_id:collab_id,sender:sender,radius: 50, ...commonConfig },
+            'shape':data,
+            });
          break;
 
       case "triangle":
@@ -76,6 +101,11 @@ $(".tools > div").click(function () {
             height: height,
             ...commonConfig
          }));
+
+         sendMessage({ 'message':{ collab_id:collab_id,sender:sender,width: width, height: height, ...commonConfig },
+            'shape':data,
+            });
+         
          break;
 
          case "font":

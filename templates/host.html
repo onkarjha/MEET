@@ -2,6 +2,11 @@
    <head>
       {% include 'head.html' %}
       <title>Collaborate - {{collab_id}}</title>
+      <style>
+        .canvas-container{
+            background-color: #fff;
+        }
+      </style>
    </head>
    <body>
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
@@ -47,9 +52,29 @@
       <p class="fill" hidden>#ffffff</p>
       <p class="stroke" hidden>#000000</p>
       <p class="stroke_" hidden>1</p>
+      <p class="sender">{{sender}}</p>
+      <p class="collab_id">{{collab_id}}</p>
       <script>
-         const v='ws://' + window.location.host + '/ws/chat/';
-        
+
+
+        const collab_id=$(".collab_id").text();
+        const sender=$(".sender").text();
+   if(sender=="False"){
+      alert("You are not logged in!");
+      window.location.href=window.location.protocol+"//"+window.location.host+'/auth/login';
+      
+   }if(collab_id=="False"){
+      alert("Please Provide Collab ID and Password to join!");
+      window.location.href=window.location.protocol+"//"+window.location.host+'/collab/check';
+     
+   }
+
+
+
+
+        var ws = 'ws://';
+        if(window.location.protocol=="https:"){ ws = 'wss://'; }
+         const v=ws + window.location.host + '/ws/chat/';
          const chatSocket = new WebSocket(v);
          const localVideo = document.getElementById('localVideo');
          const remoteVideo = document.getElementById('remoteVideo');
@@ -60,19 +85,97 @@
  
          
          chatSocket.onmessage = function(e) {
-            console.log(e);
+            
+            
              const data = JSON.parse(e.data);
              if (data.message) {
-                 console.log(data);
+                 if(data.message.sender==sender && data.message.collab_id==collab_id){
+                    console.log("SENT DATA SUCCESSFULLY");
+                    
+                    
+                 }
+                 else{
+
+
+
+                    
+                    switch(data.message.shape){
+
+
+
+
+                        case "square":
+                        canvas.isDrawingMode = false;
+                        var d = {
+                        left: data.message.left,
+                        top: data.message.top,
+                        angle: data.message.angle,
+                        fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        width: data.message.width,
+                        height: data.message.height,
+                        };
+                        canvas.add(new fabric.Rect(d));
+                        
+                    break;
+
+
+                    case "circle":
+                        canvas.isDrawingMode = false;
+                        var d = {
+                        left: data.message.left,
+                        top: data.message.top,
+                        angle: data.message.angle,
+                        fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        radius: data.message.radius,
+                        
+                        };
+                        canvas.circle(new fabric.Rect(d));
+                        
+                    break;
+
+
+
+                    case "triangle":
+                        canvas.isDrawingMode = false;
+                        var d = {
+                        left: data.message.left,
+                        top: data.message.top,
+                        angle: data.message.angle,
+                        fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        width: data.message.width,
+                        height: data.message.height,
+                        };
+                        canvas.triangle(new fabric.Rect(d));
+                        
+                    break;
+
+
+
+
+
+                    }
+
+
+
+
+
+
+                 }
              }
-             if (data.signal) {
+             /*if (data.signal) {
                  console.log("sig");
                  if (data.signal.sdp) {
                      peerConnection.setRemoteDescription(new RTCSessionDescription(data.signal.sdp));
                  } else if (data.signal.candidate) {
                      peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
                  }
-             }
+             }*/
          };
          function sendMessage(data) {
              chatSocket.send(JSON.stringify(data));

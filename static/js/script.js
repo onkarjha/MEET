@@ -160,7 +160,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if(response==1){
-                    $(".noti_").append('<div class="alert alert-success">http://localhost:8000/collab/check/?id='+collab_+'&pass='+pass_+'</div>');
+                    $(".noti_").append('<div class="alert alert-success">'+window.location.protocol+"//"+window.location.host+'/collab/check/?id='+collab_+'&pass='+pass_+'</div>');
                 }
                 
                 else {

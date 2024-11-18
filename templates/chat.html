@@ -26,7 +26,7 @@
     <video id="remoteVideo" autoplay></video>
 
     <script>
-        const chatSocket = new WebSocket('wss://' + window.location.host + '/ws/chat/');
+        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
         const messages = document.getElementById('messages');
         const localVideo = document.getElementById('localVideo');
         const remoteVideo = document.getElementById('remoteVideo');
