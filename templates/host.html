@@ -97,14 +97,13 @@
                  else{
 
 
-
-                    
-                    switch(data.message.shape){
+                    switch(data.shape){
 
 
 
 
                         case "square":
+                        
                         canvas.isDrawingMode = false;
                         var d = {
                         left: data.message.left,
@@ -133,7 +132,7 @@
                         radius: data.message.radius,
                         
                         };
-                        canvas.circle(new fabric.Rect(d));
+                        canvas.add(new fabric.Circle(d));
                         
                     break;
 
@@ -151,7 +150,7 @@
                         width: data.message.width,
                         height: data.message.height,
                         };
-                        canvas.triangle(new fabric.Rect(d));
+                        canvas.add(new fabric.Triangle(d));
                         
                     break;
 
