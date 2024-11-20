@@ -1,136 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Chat and Audio</title>
-    <style>
-        #remoteVideo {
-            width: 100%;
-            height: auto;
-            border: 1px solid black;  /* Optional, for visibility */
-        }
-
-        #localVideo {
-            width: 100%;
-            height: auto;
-            border: 1px solid black; /* Optional, for visibility */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice to Text</title>
+  <style>
+    #output {
+      margin-top: 20px;
+      font-size: 1.5em;
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <textarea id="messages" readonly></textarea>
-    <input type="text" id="messageInput">
-    <button onclick="sendMessage()">Send Message</button>
-    <button onclick="startVideoAudio()">Start Video/Audio</button>
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
+  <h1>Speech-to-Text Example</h1>
+  <button id="startButton">Start Listening</button>
+  <div id="output"></div>
 
-    <script>
-        const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
-        const messages = document.getElementById('messages');
-        const localVideo = document.getElementById('localVideo');
-        const remoteVideo = document.getElementById('remoteVideo');
+  <script>
+    // Check if the browser supports SpeechRecognition
+    const startButton = document.getElementById('startButton');
+    const outputDiv = document.getElementById('output');
 
-        const peerConnection = new RTCPeerConnection({
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        });
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-        // Handle incoming messages from the server
-        chatSocket.onmessage = async function (e) {
-            const data = JSON.parse(e.data);
+    if (SpeechRecognition) {
+      // Initialize the speech recognition object
+      const recognition = new SpeechRecognition();
+      
+      // Set the language to English
+      recognition.lang = 'en-US';
+      
+      // Continuous listening (keep listening even after user pauses)
+      recognition.continuous = true;
+      
+      // Start listening when the button is clicked
+      startButton.addEventListener('click', () => {
+        recognition.start();
+        startButton.disabled = true; // Disable the button while listening
+        outputDiv.textContent = 'Listening...';
+      });
 
-            if (data.message) {
-                messages.value += data.message + '\n';
-            }
-
-            if (data.signal) {
-                // Handle SDP signaling (Offer/Answer)
-                if (data.signal.sdp) {
-                    const remoteDescription = new RTCSessionDescription(data.signal.sdp);
-
-                    if (remoteDescription.type === 'offer') {
-                        console.log("Received offer, setting remote description and creating answer");
-                        await peerConnection.setRemoteDescription(remoteDescription);
-
-                        // Create an answer and send it back to the caller
-                        const answer = await peerConnection.createAnswer();
-                        await peerConnection.setLocalDescription(answer);
-                        chatSocket.send(JSON.stringify({ signal: { sdp: answer } }));
-                    } else if (remoteDescription.type === 'answer') {
-                        console.log("Received answer, setting remote description");
-
-                        // Avoid setting remote answer in the wrong signaling state
-                        if (peerConnection.signalingState === 'have-local-offer') {
-                            await peerConnection.setRemoteDescription(remoteDescription);
-                        } else {
-                            console.log("Skipping setting remote answer; wrong state:", peerConnection.signalingState);
-                        }
-                    }
-                }
-
-                // Handle ICE candidates
-                if (data.signal.candidate) {
-                    console.log("Received ICE candidate, adding to peer connection");
-                    try {
-                        await peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
-                    } catch (error) {
-                        console.log('Error adding ICE candidate:', error);
-                    }
-                }
-            }
-        };
-
-        // Send messages and ICE candidates
-        function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            chatSocket.send(JSON.stringify({ 'message': messageInput.value }));
-            messageInput.value = '';
+      // This event is fired when a word or phrase is recognized
+      recognition.onresult = (event) => {
+        let transcript = '';
+        // Loop through all results and extract them
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript + ' ';
+          }
         }
 
-        // Set up the video and audio stream and initiate the WebRTC connection
-        async function startVideoAudio() {
-            try {
-                // Get user media stream (video & audio)
-                const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream; // Show local video
+        // Update the output text in real-time as new words are recognized
+        outputDiv.textContent = transcript.trim();
+      };
 
-                // Add local tracks to the peer connection
-                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+      // Handle errors, e.g., user denies microphone access
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event);  // Log the full error to the console
+        outputDiv.textContent = `Error occurred: ${event.error}`;
+        startButton.disabled = false; // Re-enable the button if there's an error
+      };
 
-                // Create an offer to start the WebRTC connection
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
+      // This event fires when the speech recognition service ends (either by the user or automatically)
+      recognition.onend = () => {
+        outputDiv.textContent += '\nListening has ended.';
+        startButton.disabled = false; // Re-enable the button after listening ends
+      };
 
-                // Send the offer to the other peer
-                chatSocket.send(JSON.stringify({ signal: { sdp: offer } }));
-
-                // Wait for the local SDP to be set before sending ICE candidates
-                peerConnection.onicecandidate = function (event) {
-                    if (event.candidate) {
-                        chatSocket.send(JSON.stringify({ signal: { candidate: event.candidate } }));
-                    }
-                };
-
-            } catch (error) {
-                console.error('Error accessing media devices:', error);
-            }
-        }
-
-        // When remote tracks are added (e.g., remote video stream)
-        peerConnection.ontrack = function (event) {
-            const remoteStream = event.streams[0];
-            console.log("Received remote stream:", remoteStream); // Log the remote stream
-            if (remoteStream) {
-                remoteVideo.srcObject = remoteStream; // Set remote stream to the video element
-            }
-        };
-
-        // Handle ICE candidates (send candidates for the local peer)
-        peerConnection.onicecandidate = function (event) {
-            if (event.candidate) {
-                chatSocket.send(JSON.stringify({ signal: { candidate: event.candidate } }));
-            }
-        };
-    </script>
+    } else {
+      outputDiv.textContent = 'Your browser does not support SpeechRecognition.';
+    }
+  </script>
 </body>
 </html>

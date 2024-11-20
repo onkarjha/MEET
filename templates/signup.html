@@ -2,6 +2,11 @@
 <html>
    <head>
       {% include 'head.html' %}
+      <style>
+         .btn:disabled{
+            background-color: var(--p);
+         }
+      </style>
       <title>Authentication</title>
    
    </head>
@@ -20,10 +25,14 @@
                 <div>
                 <label>Email</label>
                    <input type="email" class="login_email" placeholder="Email" required name="email">
+                   
+                   <p style="margin-bottom: 0px;color: red;padding:0 10px;font-size: 13px;" class="email_vali"></p>
                    </div>
                    <div>
                    <label>Password</label>
                    <input type="password" class="login_pass" placeholder="Password" name="pass">
+                   
+                   <p style="margin-bottom: 0px;color: red;padding:0 10px;font-size: 13px;" class="pass_vali"></p>
                    </div>
                    <div class="f_pass">
                       <a href="#">Forgot Password?</a>

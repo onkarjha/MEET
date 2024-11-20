@@ -1,5 +1,6 @@
 $(document).ready(function() {
     $('.sign_otp_button').prop('disabled', true);
+    $(".login_btn").prop('disabled', true);
     function validateName(name) {
         const trimmedName = name.trim();
         const regex = /^[A-Za-z\s]+$/;
@@ -42,6 +43,13 @@ $(document).ready(function() {
 
             $('.sign_otp_button').prop('disabled', true);
         }
+    });  $(".login_email,.login_pass").keyup(function() {
+        if (validateEmail($(".login_email").val()) == 1 && validatePassword($(".login_pass").val()) == 1) {
+            $('.login_btn').prop('disabled', false);
+        } else {
+
+            $('.login_btn').prop('disabled', true);
+        }
     });
     $(".signup_name").keyup(function() {
 
@@ -68,6 +76,26 @@ $(document).ready(function() {
     $(".signup_pass").keyup(function() {
 
         var name = $(".signup_pass").val();
+        var n_ = validatePassword(name);
+        if (n_ == 1) {
+            $(".pass_vali").text("");
+        } else {
+            $(".pass_vali").text(n_);
+        }
+    });$(".login_email").keyup(function() {
+
+        var name = $(".login_email").val();
+        var n_ = validateEmail(name);
+        if (n_ == 1) {
+            $(".email_vali").text("");
+        } else {
+            $(".email_vali").text(n_);
+        }
+    });
+
+    $(".login_pass").keyup(function() {
+
+        var name = $(".login_pass").val();
         var n_ = validatePassword(name);
         if (n_ == 1) {
             $(".pass_vali").text("");
