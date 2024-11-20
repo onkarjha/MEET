@@ -1,0 +1,9 @@
+1. 404 FOR FILES
+   Because of static FILES
+
+   
+2. WEBSOCKET ERROR IN WINDOWS
+   Download DOCKER DESKTOP
+
+   docker pull redis:latest
+   docker run --name redis -p 6379:6379 -d redis
