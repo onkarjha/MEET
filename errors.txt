@@ -1,9 +1,16 @@
 1. 404 FOR FILES
    Because of static FILES
 
-   
+
 2. WEBSOCKET ERROR IN WINDOWS
    Download DOCKER DESKTOP
 
    docker pull redis:latest
    docker run --name redis -p 6379:6379 -d redis
+
+   to see:- docker ps
+   to stop :- docker stop <id>
+
+3. Run on other device
+
+   daphne -b 0.0.0.0 -p 8000 meet.asgi:application
