@@ -56,18 +56,33 @@
       <p class="collab_id" hidden>{{collab_id}}</p>
       <script>
 
+function findObjectById(id) {
+const objects = canvas.getObjects();
+return objects.find(obj => obj.id === id); 
+}
 
-        const collab_id=$(".collab_id").text();
-        const sender=$(".sender").text();
-   if(sender=="False"){
-      alert("You are not logged in!");
-      window.location.href=window.location.protocol+"//"+window.location.host+'/auth/login';
-      
-   }if(collab_id=="False"){
-      alert("Please Provide Collab ID and Password to join!");
-      window.location.href=window.location.protocol+"//"+window.location.host+'/collab/check';
-     
-   }
+function updateShapeData(id, newData) {
+const obj = findObjectById(id); 
+
+if (obj) {
+obj.set(newData);  
+
+canvas.renderAll();
+} else {
+console.log("It looks like you have deleted some items");
+}
+}
+const collab_id=$(".collab_id").text();
+const sender=$(".sender").text();
+if(sender=="False"){
+alert("You are not logged in!");
+window.location.href=window.location.protocol+"//"+window.location.host+'/auth/login';
+
+}if(collab_id=="False"){
+alert("Please Provide Collab ID and Password to join!");
+window.location.href=window.location.protocol+"//"+window.location.host+'/collab/check';
+
+}
 
 
 
@@ -91,6 +106,8 @@
              if (data.message) {
                  if(data.message.sender==sender && data.message.collab_id==collab_id){
                     console.log("SENT DATA SUCCESSFULLY");
+                    //console.log(data.message);
+                    
                     
                     
                  }
@@ -103,9 +120,11 @@
 
 
                         case "square":
-                        
+                        if(data.message.type=="NEW"){
                         canvas.isDrawingMode = false;
+                        console.log(data.message);
                         var d = {
+                        id:data.message.id,
                         left: data.message.left,
                         top: data.message.top,
                         angle: data.message.angle,
@@ -115,17 +134,36 @@
                         width: data.message.width,
                         height: data.message.height,
                         };
-                        canvas.add(new fabric.Rect(d));
+                        canvas.add(new fabric.Rect(d));}
+                        else{
+                         updateShapeData(data.message.id, {
+                            left: data.message.left,
+                            top: data.message.top,
+                            height:data.message.height,
+                            width:data.message.width,
+                            angle:data.message.angle,
+                            radius:data.message.radius,
+                            fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        width: data.message.width,
+                        height: data.message.height,
+    
+});
+
+                        }
                         
                     break;
 
 
                     case "circle":
+                    if(data.message.type=="NEW"){
                         canvas.isDrawingMode = false;
                         var d = {
                         left: data.message.left,
                         top: data.message.top,
                         angle: data.message.angle,
+                        id:data.message.id,
                         fill: data.message.fill,
                         stroke: data.message.stroke,
                         strokeWidth: data.message.strokeWidth,
@@ -133,17 +171,37 @@
                         
                         };
                         canvas.add(new fabric.Circle(d));
+                    }else{
+                         updateShapeData(data.message.id, {
+                            left: data.message.left,
+                            top: data.message.top,
+                            height:data.message.height,
+                            width:data.message.width,
+                            angle:data.message.angle,
+                            radius:data.message.radius,
+                            fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        width: data.message.width,
+                        height: data.message.height,
+    
+});
+
+                        }
+                        
                         
                     break;
 
 
 
                     case "triangle":
+                        if(data.message.type=="NEW"){
                         canvas.isDrawingMode = false;
                         var d = {
                         left: data.message.left,
                         top: data.message.top,
                         angle: data.message.angle,
+                        id:data.message.id,
                         fill: data.message.fill,
                         stroke: data.message.stroke,
                         strokeWidth: data.message.strokeWidth,
@@ -151,6 +209,23 @@
                         height: data.message.height,
                         };
                         canvas.add(new fabric.Triangle(d));
+                    }else{
+                         updateShapeData(data.message.id, {
+                            left: data.message.left,
+                            top: data.message.top,
+                            height:data.message.height,
+                            width:data.message.width,
+                            angle:data.message.angle,
+                            radius:data.message.radius,
+                            fill: data.message.fill,
+                        stroke: data.message.stroke,
+                        strokeWidth: data.message.strokeWidth,
+                        width: data.message.width,
+                        height: data.message.height,
+    
+});
+
+                        }
                         
                     break;
 
