@@ -2,9 +2,11 @@ $(document).ready(function() {
     $(".colors>div").click(function() {
         var c = $(this).attr("title");
         $(".fill").text(c);
-        var current=canvas.getActiveObject();
-        current.set({fill:c}); // Update the shape's data
-        current.setCoords();   // Recalculate the coordinates of the object's bounding box
+        var current = canvas.getActiveObject();
+        current.set({
+            fill: c
+        }); // Update the shape's data
+        current.setCoords(); // Recalculate the coordinates of the object's bounding box
         canvas.renderAll();
         sendShapeUpdate(current);
     });
@@ -12,10 +14,7 @@ $(document).ready(function() {
     $(".lines>div").click(function() {
         var c = $(this).attr("title");
         $(".stroke_").text(c);
-       /* var current=canvas.getActiveObject();
-        current.set({strokeWidth:c}); // Update the shape's data
-        current.setCoords();   // Recalculate the coordinates of the object's bounding box
-        canvas.renderAll();*/
+
     });
 
     $(".tools > div").click(function() {
@@ -39,8 +38,8 @@ fabric.Object.ownDefaults.transparentCorners = false;
 
 function generateShapeID() {
     const currentDate = new Date();
-    const timestamp = currentDate.getTime();  // Get the current time in milliseconds
-    const randomFiveDigit = Math.floor(10000 + Math.random() * 90000);  // Generate a random 5-digit number
+    const timestamp = currentDate.getTime(); // Get the current time in milliseconds
+    const randomFiveDigit = Math.floor(10000 + Math.random() * 90000); // Generate a random 5-digit number
     return `${timestamp}${randomFiveDigit}`;
 }
 
@@ -49,38 +48,70 @@ function generateShapeID() {
 function getCommonConfig() {
     return {
         type: "NEW",
-       width:100,
-        height:100,
+        width: 100,
+        height: 100,
         left: (window.innerWidth - 200) / 2,
         top: (window.innerHeight - 200) / 2,
         angle: 0,
         fill: $(".fill").text(),
         stroke: $(".stroke").text(),
         strokeWidth: parseInt($(".stroke_").text()),
-        id: generateShapeID(),radius:50
+        id: generateShapeID(),
+        radius: 50
     };
 }
 
 // Helper function to add shape and send message
 function addShapeToCanvas(shapeType, additionalConfig) {
     const config = getCommonConfig();
-    const shapeConfig = { ...config, ...additionalConfig };
+    const shapeConfig = {
+        ...config,
+        ...additionalConfig
+    };
 
     let shape;
     switch (shapeType) {
         case "square":
-            
+
             shape = new fabric.Rect(shapeConfig);
+            canvas.add(shape);
+            sendMessage({
+                'message': {
+                    collab_id: $(".collab_id").text(),
+                    sender: $(".sender").text(),
+                    ...shapeConfig
+                },
+                'shape': shapeType
+            });
             break;
         case "circle":
             shape = new fabric.Circle(shapeConfig);
+            canvas.add(shape);
+            sendMessage({
+                'message': {
+                    collab_id: $(".collab_id").text(),
+                    sender: $(".sender").text(),
+                    ...shapeConfig
+                },
+                'shape': shapeType
+            });
             break;
         case "triangle":
             shape = new fabric.Triangle(shapeConfig);
+            canvas.add(shape);
+            sendMessage({
+                'message': {
+                    collab_id: $(".collab_id").text(),
+                    sender: $(".sender").text(),
+                    ...shapeConfig
+                },
+                'shape': shapeType
+            });
             break;
         case "font":
-            shape = new fabric.Textbox('Add Your Text Here', {
+            var da={
                 left: shapeConfig.left,
+                type_:"NEW",
                 top: shapeConfig.top,
                 width: 200,
                 fontSize: 30,
@@ -88,22 +119,25 @@ function addShapeToCanvas(shapeType, additionalConfig) {
                 backgroundColor: 'transparent',
                 borderColor: 'gray',
                 fontFamily: 'Courier Prime',
-                fill: 'black',id: generateShapeID(),
+                fill: 'black',
+                id: generateShapeID(),
+            };
+            shape = new fabric.Textbox('TEXT HERE', da);
+            canvas.add(shape);
+            sendMessage({
+                'message': {
+                    collab_id: $(".collab_id").text(),
+                    sender: $(".sender").text(),
+                    ...da
+                },
+                'shape': shapeType
             });
             break;
         default:
             return;
     }
 
-    canvas.add(shape);
-    sendMessage({
-        'message': {
-            collab_id: $(".collab_id").text(),
-            sender: $(".sender").text(),
-            ...shapeConfig
-        },
-        'shape': shapeType
-    });
+   
 }
 
 // Event handling for tools
@@ -150,13 +184,13 @@ $(".tools > div").click(function() {
         case "delete":
             const selectedObject = canvas.getActiveObject();
             if (selectedObject) {
-                var id=selectedObject.id;
+                var id = selectedObject.id;
                 sendMessage({
                     'message': {
                         collab_id: $(".collab_id").text(),
                         sender: $(".sender").text(),
-                        id:id,
-                        type:"delete",
+                        id: id,
+                        type: "delete",
                     },
                     'shape': "delete",
                 });
@@ -191,47 +225,50 @@ const sendShapeUpdate = (target) => {
         scaleY: target.scaleY,
         type: "UPDATE",
     };
+    console.log("SENDING UPDATE ID : " + target.id);
     sendMessage({
         'message': shapeData,
         'shape': target.type
     });
 };
+
 canvas.on('path:created', function(event) {
     const path = event.path;
+    var id_=generateShapeID();
+    path["id"]=id_;
     const pathData = {
         type: 'path', 
         path: path.get('path'),
         fill: path.fill, 
         stroke: path.stroke, 
         strokeWidth: path.strokeWidth,
-        id: generateShapeID(),
+        id: id_,
     };var da={
         message: {
             collab_id: $(".collab_id").text(),
             sender: $(".sender").text(),
             type: "NEW", 
             shape: 'path',
+            
             data: pathData,
         },
         shape: 'path'
-    };console.warn(da.message.data.id);
+    };
+    //console.warn(da.message.data.id);
     sendMessage(da);
 });
 canvas.on({
     'object:moving': function(event) {
-
+        
         sendShapeUpdate(event.target);
     },
     'object:scaling': function(event) {
-        //console.log(`Scaling: ${event.target.type}, ID: ${event.target.id}`);
         sendShapeUpdate(event.target);
     },
     'object:rotating': function(event) {
-        //console.log(`Rotating: ${event.target.type}, ID: ${event.target.id}`);
         sendShapeUpdate(event.target);
     },
     'object:skewing': function(event) {
-        //console.log(`Skewing: ${event.target.type}, ID: ${event.target.id}`);
     }
 });
 
@@ -243,7 +280,9 @@ const hit = new fabric.Circle({
     opacity: 0.5,
 });
 
-function onChange({ target }) {
+function onChange({
+    target
+}) {
     target.setCoords();
     const ctx = canvas.getTopContext();
     canvas.clearContext(ctx);
@@ -257,7 +296,9 @@ function onChange({ target }) {
             obj.getCoords(true)
         );
 
-        hit.set({ fill: obj.fill });
+        hit.set({
+            fill: obj.fill
+        });
         if (
             intersection.status === 'Intersection' ||
             intersection.status === 'Coincident' ||
@@ -268,7 +309,10 @@ function onChange({ target }) {
             ctx.save();
             ctx.transform(...canvas.viewportTransform);
             hit.transform(ctx);
-            intersection.points.forEach(({ x, y }) => {
+            intersection.points.forEach(({
+                x,
+                y
+            }) => {
                 ctx.save();
                 ctx.translate(x, y);
                 hit._render(ctx);

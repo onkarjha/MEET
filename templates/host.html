@@ -84,7 +84,8 @@ function handleShapeData(data) {
     strokeWidth: message.strokeWidth,
     width: message.width,
     height: message.height,
-    radius: radius
+    radius: radius,
+   
   };
 
   //console.log(radius);
@@ -128,22 +129,23 @@ function handleShapeData(data) {
       } 
       break;
       case "font":
-      if (message.type === "NEW") {//console.log(data.message);
-        canvas.add(new fabric.Textbox('Add Your Text Here', {
-                left: shapeConfig.left,
-                top: shapeConfig.top,
-                width: 200,
-                fontSize: 30,
-                editable: true,
-                backgroundColor: 'transparent',
-                borderColor: 'gray',
-                fontFamily: 'Courier Prime',
-                fill: 'black',//
-                id: generateShapeID(),
+      console.log(message);
+      if (message.type_ === "NEW") {//console.log(data.message);
+        //console.log(message);
+        canvas.add(new fabric.Textbox('TEXT HERE', {
+                left: message.left,
+                top: message.top,
+                width: message.width,
+                fontSize: message.fontSize,
+                editable: message.editable,
+                backgroundColor: message.backgroundColor,
+                borderColor: message.borderColor,
+                fontFamily: message.fontFamily,
+                fill: message.fill,
+                id: message.id,
             }));
       } else {
-        
-        //updateShapeData(message.id, shapeConfig);
+        updateShapeData(message.id, shapeConfig);
       }
       break;
       case "path":
@@ -164,16 +166,14 @@ function handleShapeData(data) {
 
     
     canvas.add(path);
-    canvas.renderAll();  // Render the canvas to display the new path
-    var pa=da;
+    canvas.renderAll();  
+    
     
   }else{
-//console.log();
     updateShapeData(message.id, shapeConfig);
   }
     break;
       case "textbox":
-       // console.log(message.id);
         updateShapeData(message.id, shapeConfig);
         break;
     default:
@@ -200,16 +200,15 @@ chatSocket.onmessage = function (e) {
 
   if (data.message) {
     if (data.message.sender === sender && data.message.collab_id === collab_id) {
-      console.log("SEND : "+data.message.id);
+     
     } else {
-      console.log("RECEIVED : "+data.message.id);
+      
       handleShapeData(data);
     }
   }
 };
 
 function sendMessage(data) {
-  console.log(data);
   chatSocket.send(JSON.stringify(data));
 }
 
