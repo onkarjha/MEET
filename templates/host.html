@@ -38,7 +38,7 @@
             <div style="background-color: #a8d0e6;" title="#a8d0e6"></div>
             <div style="background-color: #FF4000;" title="#FF4000"></div>
             <div style="background-color: #50B2C0;" title="#50B2C0"></div>
-            <div style="background-color: #ffffff;" title="#DCED31"></div>
+            <div style="background-color: #ffffff;" title="#ffffff"></div>
             <div style="background-color: #0CCE6B;" title="#0CCE6B"></div>
             <div style="background-color: #363537;" title="#363537"></div>
             <div style="background-color: #2E5077;" title="#2E5077"></div>
@@ -55,223 +55,166 @@
       <p class="sender" hidden>{{sender}}</p>
       <p class="collab_id" hidden>{{collab_id}}</p>
       <script>
-
-function findObjectById(id) {
-const objects = canvas.getObjects();
-return objects.find(obj => obj.id === id); 
+        function findObjectById(id) {
+  return canvas.getObjects().find(obj => obj.id === id);
 }
 
 function updateShapeData(id, newData) {
-const obj = findObjectById(id); 
-
-if (obj) {
-obj.set(newData);  
-
-canvas.renderAll();
-} else {
-console.log("It looks like you have deleted some items");
-}
-}
-const collab_id=$(".collab_id").text();
-const sender=$(".sender").text();
-if(sender=="False"){
-alert("You are not logged in!");
-window.location.href=window.location.protocol+"//"+window.location.host+'/auth/login';
-
-}if(collab_id=="False"){
-alert("Please Provide Collab ID and Password to join!");
-window.location.href=window.location.protocol+"//"+window.location.host+'/collab/check';
-
+  const obj = findObjectById(id);
+  if (obj) {
+    obj.set(newData); // Update the shape's data
+    obj.setCoords();   // Recalculate the coordinates of the object's bounding box
+    canvas.renderAll(); // Rerender the canvas to reflect the changes
+  } else {
+    console.log("Object with ID " + id + " not found.");
+  }
 }
 
+function handleShapeData(data) {
+  const { message } = data;
+  let radius = message.radius === undefined ? 50 : message.radius;
 
+  const shapeConfig = {
+    id: message.id,
+    left: message.left,
+    top: message.top,
+    angle: message.angle,
+    fill: message.fill,
+    stroke: message.stroke,
+    strokeWidth: message.strokeWidth,
+    width: message.width,
+    height: message.height,
+    radius: radius
+  };
 
+  //console.log(radius);
 
-        var ws = 'ws://';
-        if(window.location.protocol=="https:"){ ws = 'wss://'; }
-         const v=ws + window.location.host + '/ws/chat/';
-         const chatSocket = new WebSocket(v);
-         const localVideo = document.getElementById('localVideo');
-         const remoteVideo = document.getElementById('remoteVideo');
-         const messages = document.getElementById('messages');
- 
-         const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-         const peerConnection = new RTCPeerConnection(configuration);
- 
-         
-         chatSocket.onmessage = function(e) {
-            
-            
-             const data = JSON.parse(e.data);
-             if (data.message) {
-                 if(data.message.sender==sender && data.message.collab_id==collab_id){
-                    console.log("SENT DATA SUCCESSFULLY");
-                    //console.log(data.message);
-                    
-                    
-                    
-                 }
-                 else{
+  let shapeType = data.shape === "rect" ? "square" : data.shape;
 
+  switch (shapeType) {
+    case "square":
+      if (message.type === "NEW") {
+        canvas.isDrawingMode = false;
+        canvas.add(new fabric.Rect(shapeConfig));
+      } else {
+        updateShapeData(message.id, shapeConfig);
+      }
+      break;
 
-                    switch(data.shape){
+    case "circle":
+      if (message.type === "NEW") {
+        canvas.isDrawingMode = false;
+      //  console.log(shapeConfig);
+        canvas.add(new fabric.Circle(shapeConfig));
+      } else {
+        updateShapeData(message.id, shapeConfig);
+      }
+      break;
 
+      case "triangle":
+      if (message.type === "NEW") {
+        canvas.isDrawingMode = false;
+        canvas.add(new fabric.Triangle(shapeConfig));
+      } else {
+        updateShapeData(message.id, shapeConfig);
+      }
+      break;
+      case "delete":
+      if (message.type === "delete") {
+        canvas.remove(findObjectById(message.id));
+                canvas.discardActiveObject();
+                canvas.renderAll();
+        
+      } 
+      break;
+      case "font":
+      if (message.type === "NEW") {//console.log(data.message);
+        canvas.add(new fabric.Textbox('Add Your Text Here', {
+                left: shapeConfig.left,
+                top: shapeConfig.top,
+                width: 200,
+                fontSize: 30,
+                editable: true,
+                backgroundColor: 'transparent',
+                borderColor: 'gray',
+                fontFamily: 'Courier Prime',
+                fill: 'black',//
+                id: generateShapeID(),
+            }));
+      } else {
+        
+        //updateShapeData(message.id, shapeConfig);
+      }
+      break;
+      case "path":
+      if (message.type === "NEW") {
+       
+    const pathData = message.data.path;  
+    const fillColor = message.data.fill; 
+    const strokeColor = message.data.stroke;  
+    const strokeWidth = message.data.strokeWidth; 
+    const pathId = message.data.id; 
+    var da={
+        fill: fillColor,  // Set the fill color
+        stroke: strokeColor,  // Set the stroke color
+        strokeWidth: strokeWidth,  // Set the stroke width
+        id: pathId,  // Set the ID (optional)
+    };
+    const path = new fabric.Path(pathData, da);
 
-
-
-                        case "square":
-                        if(data.message.type=="NEW"){
-                        canvas.isDrawingMode = false;
-                        console.log(data.message);
-                        var d = {
-                        id:data.message.id,
-                        left: data.message.left,
-                        top: data.message.top,
-                        angle: data.message.angle,
-                        fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        width: data.message.width,
-                        height: data.message.height,
-                        };
-                        canvas.add(new fabric.Rect(d));}
-                        else{
-                         updateShapeData(data.message.id, {
-                            left: data.message.left,
-                            top: data.message.top,
-                            height:data.message.height,
-                            width:data.message.width,
-                            angle:data.message.angle,
-                            radius:data.message.radius,
-                            fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        width: data.message.width,
-                        height: data.message.height,
     
-});
-
-                        }
-                        
-                    break;
-
-
-                    case "circle":
-                    if(data.message.type=="NEW"){
-                        canvas.isDrawingMode = false;
-                        var d = {
-                        left: data.message.left,
-                        top: data.message.top,
-                        angle: data.message.angle,
-                        id:data.message.id,
-                        fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        radius: data.message.radius,
-                        
-                        };
-                        canvas.add(new fabric.Circle(d));
-                    }else{
-                         updateShapeData(data.message.id, {
-                            left: data.message.left,
-                            top: data.message.top,
-                            height:data.message.height,
-                            width:data.message.width,
-                            angle:data.message.angle,
-                            radius:data.message.radius,
-                            fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        width: data.message.width,
-                        height: data.message.height,
+    canvas.add(path);
+    canvas.renderAll();  // Render the canvas to display the new path
+    var pa=da;
     
-});
+  }else{
+//console.log();
+    updateShapeData(message.id, shapeConfig);
+  }
+    break;
+      case "textbox":
+       // console.log(message.id);
+        updateShapeData(message.id, shapeConfig);
+        break;
+    default:
+      console.error("Unsupported shape type:", data.shape);
+  }
+}
 
-                        }
-                        
-                        
-                    break;
+const collab_id = $(".collab_id").text();
+const sender = $(".sender").text();
 
+if (sender === "False") {
+  alert("You are not logged in!");
+  window.location.href = `${window.location.protocol}//${window.location.host}/auth/login`;
+} else if (collab_id === "False") {
+  alert("Please Provide Collab ID and Password to join!");
+  window.location.href = `${window.location.protocol}//${window.location.host}/collab/check`;
+}
 
+const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+const chatSocket = new WebSocket(`${wsProtocol}${window.location.host}/ws/chat/`);
 
-                    case "triangle":
-                        if(data.message.type=="NEW"){
-                        canvas.isDrawingMode = false;
-                        var d = {
-                        left: data.message.left,
-                        top: data.message.top,
-                        angle: data.message.angle,
-                        id:data.message.id,
-                        fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        width: data.message.width,
-                        height: data.message.height,
-                        };
-                        canvas.add(new fabric.Triangle(d));
-                    }else{
-                         updateShapeData(data.message.id, {
-                            left: data.message.left,
-                            top: data.message.top,
-                            height:data.message.height,
-                            width:data.message.width,
-                            angle:data.message.angle,
-                            radius:data.message.radius,
-                            fill: data.message.fill,
-                        stroke: data.message.stroke,
-                        strokeWidth: data.message.strokeWidth,
-                        width: data.message.width,
-                        height: data.message.height,
-    
-});
+chatSocket.onmessage = function (e) {
+  const data = JSON.parse(e.data);
 
-                        }
-                        
-                    break;
+  if (data.message) {
+    if (data.message.sender === sender && data.message.collab_id === collab_id) {
+      console.log("SEND : "+data.message.id);
+    } else {
+      console.log("RECEIVED : "+data.message.id);
+      handleShapeData(data);
+    }
+  }
+};
 
+function sendMessage(data) {
+  console.log(data);
+  chatSocket.send(JSON.stringify(data));
+}
 
-
-
-
-                    }
-
-
-
-
-
-
-                 }
-             }
-             /*if (data.signal) {
-                 console.log("sig");
-                 if (data.signal.sdp) {
-                     peerConnection.setRemoteDescription(new RTCSessionDescription(data.signal.sdp));
-                 } else if (data.signal.candidate) {
-                     peerConnection.addIceCandidate(new RTCIceCandidate(data.signal.candidate));
-                 }
-             }*/
-         };
-         function sendMessage(data) {
-             chatSocket.send(JSON.stringify(data));
-            
-         }
- 
-         /*
-         navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-             localVideo.srcObject = stream;
-             stream.getTracks().forEach(track => peerConnection.addTrack(track, stream));
-         });
- 
-         peerConnection.onicecandidate = function(event) {
-             if (event.candidate) {
-                 chatSocket.send(JSON.stringify({ 'signal': { 'candidate': event.candidate } }));
-             }
-         };
- 
-         peerConnection.ontrack = function(event) {
-             remoteVideo.srcObject = event.streams[0];
-         };*/
-     </script>
+      </script>
+        
       {% include 'footer.html' %}
    </body>
 </html>
