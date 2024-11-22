@@ -120,6 +120,7 @@ function addShapeToCanvas(shapeType, additionalConfig) {
                 borderColor: 'gray',
                 fontFamily: 'Courier Prime',
                 fill: 'black',
+                what:"font_",
                 id: generateShapeID(),
             };
             shape = new fabric.Textbox('TEXT HERE', da);
@@ -223,9 +224,10 @@ const sendShapeUpdate = (target) => {
         opacity: target.opacity,
         scaleX: target.scaleX,
         scaleY: target.scaleY,
+        
         type: "UPDATE",
     };
-    console.log("SENDING UPDATE ID : " + target.id);
+    //console.log("SENDING UPDATE ID : " + target.id);
     sendMessage({
         'message': shapeData,
         'shape': target.type
@@ -254,9 +256,26 @@ canvas.on('path:created', function(event) {
         },
         shape: 'path'
     };
-    //console.warn(da.message.data.id);
     sendMessage(da);
 });
+canvas.on('text:changed', function(e) {
+    var textbox = e.target; 
+   
+    var da={
+        message: {
+            collab_id: $(".collab_id").text(),
+            sender: $(".sender").text(),
+            type: "UPDATE", 
+            id:textbox.id,
+            
+            text: textbox.text,
+        },
+        shape: 'font',
+    };
+    sendMessage(da);
+  //  console.log(da);
+});
+
 canvas.on({
     'object:moving': function(event) {
         

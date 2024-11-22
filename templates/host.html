@@ -5,18 +5,25 @@
       <style>
         .canvas-container{
             background-color: #fff;
+        }.mic{
+          position: fixed;
+          z-index: 1000;
+          bottom: 50px;
+          right: 50px;
+          font-size: 40px;
+          box-shadow: var(--sh);
         }
       </style>
    </head>
    <body>
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
       <div class="tools">
-      <div title="square"><i class="fi fi-sr-square"></i></div>
-      <div title="circle"><i class="fi fi-sr-circle"></i></div>
-      <div title="triangle"><i class="fi fi-sr-triangle"></i></div>
-      <div title="pencil"><i class="fi fi-sr-pen-swirl"></i></div>
+      <div title="square"><i class="fi fi-rr-square"></i></div>
+      <div title="circle"><i class="fi fi-rr-circle"></i></div>
+      <div title="triangle"><i class="fi fi-rr-triangle"></i></div>
+      <div title="pencil"><i class="fi fi-rr-attribution-pencil"></i></div>
       <div title="stroke">
-         <i class="fi fi-sr-line-width"></i>
+        <i class="fi fi-rr-grip-lines"></i>
          <div class="lines" style="display: none;">
             <div style="border:1px solid #000;" title="1">1px</div>
             <div style="border:1px solid #000;" title="2">2px</div>
@@ -25,9 +32,9 @@
             <div style="border:1px solid #000;" title="5">5px</div>
          </div>
       </div>
-      <div title="font"><i class="fi fi-sr-text"></i></div>
+      <div title="font"><i class="fi fi-rr-text"></i></div>
       <div title="fill" style="position: relative;">
-         <i class="fi fi-sr-palette"></i>
+         <i class="fi fi-rr-palette"></i>
          <div class="colors" style="display: none;">
             <div style="background-color: #582B11;" title="#582B11"></div>
             <div style="background-color: #AF125A;" title="#AF125A"></div>
@@ -47,15 +54,48 @@
             <div style="background-color: #6457A6;" title="#6457A6"></div>
          </div>
       </div>
-      <div title="delete"><i class="fi fi-sr-trash"></i></div>
+      <div title="delete"><i class="fi fi-rr-trash"></i></div>
       </div>
-      <p class="fill" hidden>#ffffff</p>
+      <div class="mic" onclick="speak()"><i class="fi fi-rr-circle-microphone"></i></div>
+      <p class="fill" hidden>transparent</p>
       <p class="stroke" hidden>#000000</p>
       <p class="stroke_" hidden>1</p>
       <p class="sender" hidden>{{sender}}</p>
       <p class="collab_id" hidden>{{collab_id}}</p>
       <script>
-        function findObjectById(id) {
+         function speak() {
+           
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';  // Set the language
+
+                // Start speech recognition
+                recognition.start();
+
+                recognition.onstart = function() {
+                    console.log("Speech recognition started");
+                };
+
+                recognition.onspeechend = function() {
+                    console.log("Speech recognition ended");
+                    recognition.stop();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Error occurred in speech recognition: ", event.error);
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    console.log("You said: " + transcript);
+                    document.getElementById("result").innerText = "You said: " + transcript;
+                };
+            } else {
+                alert("Speech Recognition is not supported in this browser.");
+            }
+        }
+function findObjectById(id) {
   return canvas.getObjects().find(obj => obj.id === id);
 }
 
@@ -85,6 +125,7 @@ function handleShapeData(data) {
     width: message.width,
     height: message.height,
     radius: radius,
+   
    
   };
 
@@ -145,7 +186,12 @@ function handleShapeData(data) {
                 id: message.id,
             }));
       } else {
-        updateShapeData(message.id, shapeConfig);
+        var obj = findObjectById(message.id);
+  if (obj) {
+    obj.set({text:message.text}); 
+    obj.setCoords();   
+    canvas.renderAll(); 
+  } else {}
       }
       break;
       case "path":
