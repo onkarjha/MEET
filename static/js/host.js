@@ -227,7 +227,6 @@ const sendShapeUpdate = (target) => {
         
         type: "UPDATE",
     };
-    //console.log("SENDING UPDATE ID : " + target.id);
     sendMessage({
         'message': shapeData,
         'shape': target.type
@@ -273,7 +272,6 @@ canvas.on('text:changed', function(e) {
         shape: 'font',
     };
     sendMessage(da);
-  //  console.log(da);
 });
 
 canvas.on({

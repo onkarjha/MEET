@@ -63,38 +63,7 @@
       <p class="sender" hidden>{{sender}}</p>
       <p class="collab_id" hidden>{{collab_id}}</p>
       <script>
-         function speak() {
-           
-            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                const recognition = new SpeechRecognition();
-                recognition.lang = 'en-US';  // Set the language
 
-                // Start speech recognition
-                recognition.start();
-
-                recognition.onstart = function() {
-                    console.log("Speech recognition started");
-                };
-
-                recognition.onspeechend = function() {
-                    console.log("Speech recognition ended");
-                    recognition.stop();
-                };
-
-                recognition.onerror = function(event) {
-                    console.error("Error occurred in speech recognition: ", event.error);
-                };
-
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    console.log("You said: " + transcript);
-                    document.getElementById("result").innerText = "You said: " + transcript;
-                };
-            } else {
-                alert("Speech Recognition is not supported in this browser.");
-            }
-        }
 function findObjectById(id) {
   return canvas.getObjects().find(obj => obj.id === id);
 }
@@ -106,7 +75,7 @@ function updateShapeData(id, newData) {
     obj.setCoords();   // Recalculate the coordinates of the object's bounding box
     canvas.renderAll(); // Rerender the canvas to reflect the changes
   } else {
-    console.log("Object with ID " + id + " not found.");
+    console.error("NOT FOUND : " + id);
   }
 }
 
@@ -129,7 +98,6 @@ function handleShapeData(data) {
    
   };
 
-  //console.log(radius);
 
   let shapeType = data.shape === "rect" ? "square" : data.shape;
 
@@ -146,7 +114,6 @@ function handleShapeData(data) {
     case "circle":
       if (message.type === "NEW") {
         canvas.isDrawingMode = false;
-      //  console.log(shapeConfig);
         canvas.add(new fabric.Circle(shapeConfig));
       } else {
         updateShapeData(message.id, shapeConfig);
@@ -170,9 +137,8 @@ function handleShapeData(data) {
       } 
       break;
       case "font":
-      console.log(message);
-      if (message.type_ === "NEW") {//console.log(data.message);
-        //console.log(message);
+      
+      if (message.type_ === "NEW") {
         canvas.add(new fabric.Textbox('TEXT HERE', {
                 left: message.left,
                 top: message.top,
