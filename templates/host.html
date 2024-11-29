@@ -1,17 +1,132 @@
 <html lang="en">
    <head>
-      {% include 'head.html' %}
+    {% include 'head.html' %}
+
+
+
+
+
+
+
+
       <title>Collaborate - {{collab_id}}</title>
       <style>
         .canvas-container{
             background-color: #fff;
-        }.mic{
+        }.more_options{
           position: fixed;
-          z-index: 1000;
+          bottom: 20px;
+          right:30px;
+          padding: 20px;
+          border-radius: 50px;
+          box-shadow: var(--sh);z-index: 1000;
+          border:1px solid var(--l)
+        }
+        .more_options i{
+          
+          font-size: 30px;
+        }.more_options >div{
+
+          margin-top: 20px;
+          margin-bottom: 20px;;
+        }   .chatbox-container {
+          width: 400px;
+          max-height: 600px;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          overflow: hidden;
+          background-color: #fff;
+      }
+      
+      .chatbox-header {
+          background-color: var(--p);
+          color: white;
+          padding: 10px;
+          text-align: center;
+      }
+      
+      .chatbox-header h5 {
+          color: #fff !important;
+      }
+      
+      .chatbox-body {
+          padding: 10px;
+          height: 450px;
+          overflow-y: auto;
+          background-color: #f9f9f9;
+      }
+      
+      .chatbox-body > div {
+          max-width: 80%;
+          padding: 10px 15px;
+          display: table;
+          margin-bottom: 10px;
+          border-radius: 7px;
+      }
+      
+      .sent_message {
+          float: right;
+          background-color: powderblue;
+          clear: both; /* Fixes the issue where messages might overlap */
+      }
+      
+      .received_message {
+          float: left;
+          background-color: var(--l);
+          clear: both; /* Fixes the issue where messages might overlap */
+      }
+      
+      .chatbox-body::after {
+          content: "";
+          display: table;
+          clear: both;
+      }
+      
+      .chatbox-body > div p {
+          margin-bottom: 0;
+      }
+      
+      .messager_name {
+          text-transform: uppercase;
+          font-size: 14px;
+          color: var(--p);
+      }
+      
+      .message {
+          font-size: 16px;
+          color: #222;
+      }
+      
+      .chatbox-footer {
+          padding: 10px;
+          background-color: #f1f1f1;
+      }
+      
+      .chat-input {
+          width: 100%;
+      }
+      
+      .messages_main {
+          position: fixed;
           bottom: 50px;
-          right: 50px;
-          font-size: 40px;
-          box-shadow: var(--sh);
+          right: 110px;
+      }.message_num{
+        position: absolute;
+        background-color: rgb(185, 3, 3);color: #fff;font-size: 13px;border-radius: 20px;
+        height: 23px;
+        width: 23px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: -10px;;right: -10px;;
+      }.messages_main{
+        display: none;
+      }  .fixed-bottom-middle {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
         }
       </style>
    </head>
@@ -56,12 +171,80 @@
       </div>
       <div title="delete"><i class="fi fi-rr-trash"></i></div>
       </div>
+     <!---- -->
+     <div class="more_options">
+      <div class="relative" onclick="message__()">
+        <div class="message_num">0</div>
+        <i class="fi fi-rr-messages"></i></div>
+      <div><i class="fi fi-rr-users-alt"></i></div>
       <div class="mic" onclick="speak()"><i class="fi fi-rr-circle-microphone"></i></div>
+     </div>
+     <div class="messages_main">
+      <div class="chatbox-container">
+          <div class="chatbox-header">
+              <h5>{{collab_id}}</h5>
+          </div>
+          <div class="chatbox-body">
+            <!-------------------------MESSAGES GOES HERE ---------------------------->
+          </div>
+          <div class="chatbox-footer">
+              <form class="send_sms">
+                  <div class="input-group">
+                      <input type="text" class="form-control chat-input" placeholder="Type a message" required>
+                      <button class="btn btn-primary" type="submit">Send</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  
+
+  
       <p class="fill" hidden>transparent</p>
       <p class="stroke" hidden>#000000</p>
       <p class="stroke_" hidden>1</p>
       <p class="sender" hidden>{{sender}}</p>
       <p class="collab_id" hidden>{{collab_id}}</p>
+      <div id="alert" class="alert alert-success fixed-bottom-middle" role="alert" style="display: none;">
+        <!-- Dynamic content will be inserted here -->
+    </div>
+      <script>
+        function showAlert(message) {
+            var alertElement = document.getElementById('alert');
+            
+            // Set the dynamic message
+            alertElement.innerHTML = message;
+            
+            // Show the alert
+            alertElement.style.display = 'block';
+            
+            // Hide the alert after 3 seconds
+            setTimeout(function() {
+                alertElement.style.display = 'none';
+            }, 3000);
+        }
+        function message__(){$(".message_num").text(0);
+          $(".messages_main").toggle(100);
+        }
+        $(document).ready(function(){
+$(".send_sms").on('submit',function(e){
+e.preventDefault();
+var mess=$(".chat-input").val();
+$(".chatbox-body").append(' <div class="sent_message"><p class="message">'+mess+'</p></div>');
+$(this)[0].reset();      $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
+sendMessage({
+                'message': {
+                    collab_id: $(".collab_id").text(),
+                    sender: $(".sender").text(),
+                    sender_name:"ONKAR JHA",
+                    message:mess,
+                    
+                },
+                'shape': 'message'
+            });
+});
+        });
+      </script>
       <script>
 
 function findObjectById(id) {
@@ -212,10 +395,16 @@ chatSocket.onmessage = function (e) {
 
   if (data.message) {
     if (data.message.sender === sender && data.message.collab_id === collab_id) {
-     
+
     } else {
-      
-      handleShapeData(data);
+      if(data.shape=="message"){
+        showAlert("["+data.message.sender_name+"] "+data.message.message);
+        $(".message_num").text(parseInt($(".message_num").text()) + 1);
+
+        $(".chatbox-body").append(' <div class="received_message"><p class="messager_name">'+data.message.sender_name+'</p><p class="message">'+data.message.message+'</p></div>');
+            $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
+              }else{
+      handleShapeData(data);}
     }
   }
 };

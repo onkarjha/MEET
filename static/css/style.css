@@ -45,6 +45,8 @@ p,span {
 color:var(--fc);
 font-size:18px;
 line-height:24px
+}.relative{
+	position: relative;
 }
 .form_body{
 	background: url('/static/images/chat.jpg');
