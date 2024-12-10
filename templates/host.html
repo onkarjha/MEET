@@ -144,6 +144,13 @@
         transform: translateX(-50%);
         z-index: 1050;
         }
+        .socketError {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        }
      </style>
    </head>
    <body>
@@ -230,6 +237,22 @@
       <div id="alert" class="alert alert-success fixed-bottom-middle" role="alert" style="display: none;">
          <!-- Dynamic content will be inserted here -->
       </div>
+      <script>
+        if (window.innerWidth <= 700) {
+    // Clear the body content
+    document.body.innerHTML = "";
+    
+    // Add a message
+    const messageDiv = document.createElement("div");
+    messageDiv.style.display = "flex";
+    messageDiv.style.alignItems = "center";
+    messageDiv.style.justifyContent = "center";
+    messageDiv.style.height = "100vh"; // Ensure the div takes full screen height
+    messageDiv.textContent = "INCOMPATIBLE SCREEN SIZE :(";
+    document.body.appendChild(messageDiv);
+}
+
+      </script>
       <script>
          function showAlert(message) {
              var alertElement = document.getElementById('alert');
@@ -429,6 +452,9 @@
                handleShapeData(data);}
              }
            }
+         };
+         chatSocket.onerror = (error) => {
+         $("body").append(' <div class="socketError"><p class="alert alert-danger">Unable to connect to Socket :(</p></div>');
          };
          
          function sendMessage(data) {

@@ -6,7 +6,7 @@
    Download DOCKER DESKTOP
 
    docker pull redis:latest
-   docker run --name redis -p 6379:6379 -d redis
+   docker run --name redis_new_name -p 6379:6379 -d redis
 
    to see:- docker ps
    to stop :- docker stop <id>
