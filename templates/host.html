@@ -3,110 +3,148 @@
       {% include 'head.html' %}
       <title>Collaborate - {{collab_id}}</title>
       <style>
-         .canvas-container{
-         background-color: #fff;
-         }.more_options{
-         position: fixed;
-         bottom: 20px;
-         right:30px;
-         padding: 20px;
-         border-radius: 50px;
-         box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;z-index: 1000;
-         border:1px solid var(--l)
-         }
-         .more_options i{
-         cursor: pointer;
-         font-size: 30px;
-         }.more_options >div{
-         margin-top: 20px;
-         margin-bottom: 20px;;
-         }   .chatbox-container {
-         width: 400px;
-         max-height: 600px;box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-         border: 1px solid #ccc;
-         border-radius: 8px;
-         overflow: hidden;
-         background-color: #fff;
-         }
-         .chatbox-header {
-         background-color: var(--p);
-         color: white;
-         padding: 10px;
-         text-align: center;
-         }
-         .chatbox-header h5 {
-         color: #fff !important;
-         }
-         .chatbox-body {
-         padding: 10px;
-         height: 450px;
-         overflow-y: auto;
-         background-color: #f9f9f9;
-         }
-         .chatbox-body > div {
-         max-width: 80%;
-         padding: 10px 15px;
-         display: table;
-         margin-bottom: 10px;
-         border-radius: 7px;
-         }
-         .sent_message {
-         float: right;
-         background-color: powderblue;
-         clear: both; /* Fixes the issue where messages might overlap */
-         }
-         .received_message {
-         float: left;
-         background-color: var(--l);
-         clear: both; /* Fixes the issue where messages might overlap */
-         }
-         .chatbox-body::after {
-         content: "";
-         display: table;
-         clear: both;
-         }
-         .chatbox-body > div p {
-         margin-bottom: 0;
-         }
-         .messager_name {
-         text-transform: uppercase;
-         font-size: 14px;
-         color: var(--p);
-         }
-         .message {
-         font-size: 16px;
-         color: #222;
-         }
-         .chatbox-footer {
-         padding: 10px;
-         background-color: #f1f1f1;
-         }
-         .chat-input {
-         width: 100%;
-         }
-         .messages_main {
-         position: fixed;
-         bottom: 50px;
-         right: 110px;
-         }.message_num{
-         position: absolute;
-         background-color: rgb(185, 3, 3);color: #fff;font-size: 13px;border-radius: 20px;
-         height: 23px;
-         width: 23px;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-         top: -10px;;right: -10px;;
-         }.messages_main{
-         display: none;
-         }  .fixed-bottom-middle {
-         position: fixed;
-         bottom: 20px;
-         left: 50%;
-         transform: translateX(-50%);
-         z-index: 1050;
-         }
-      </style>
+        .canvas-container{
+        background-color: #fff;
+        }.more_options{
+        position: fixed;
+        bottom: 20px;
+        right:30px;
+        padding: 20px;
+        border-radius: 50px;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        z-index: 1000;
+        border:1px solid var(--l)
+        }
+        .more_options i{
+        cursor: pointer;
+        font-size: 30px;
+        }.more_options >div{
+        margin-top: 20px;
+        margin-bottom: 20px;;
+        }   .chatbox-container {
+        width: 350px;
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #fff;
+        }.chatbox-header>h5{
+        color: #fff!important;margin-bottom: 0;
+        }.chatbox-header>p,.chatbox-header span{margin-bottom: 0;
+        color: #fff;font-size: 14px;margin-top: 5px;
+        }
+        .chatbox-header {
+        background-color: var(--p);height: 150px;;display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        }
+        .chatbox-header:before {
+    background-image: url('https://client.crisp.chat/static/images/tiles/signal.svg') !important;
+    background-size: 72px !important;
+    opacity: 0.075 !important;
+    height: 150px;
+    content: "" !important;
+    background-repeat: repeat !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+}
+.users{
+        display: flex;margin-bottom: 10px;
+        }.users .ava {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 2px solid var(--p);background-color: #fff;
+        padding: 5px;
+        margin-left: -10px; /* Overlap effect */
+        z-index: 1;display: flex;
+        align-items: center;
+        justify-content: center;
+        }.ava{
+        }
+        .users .ava:first-child {
+        margin-left: 0; /* Reset margin for the first avatar */
+        }
+        .chatbox-body {
+        padding: 10px;
+        height: 400px;
+        overflow-y: auto;
+        }
+        .chatbox-body > div {
+        max-width: 80%;
+        padding: 5px 10px;
+        display: table;
+        margin-bottom: 10px;
+        border-radius: 7px;
+        }
+        .sent_message {
+        float: right;
+        background-color: var(--p);
+        clear: both; /* Fixes the issue where messages might overlap */
+        }.sent_message>p{
+        color: #fff;
+        }
+        .received_message {
+        float: left;
+        background-color: var(--l);
+        clear: both; /* Fixes the issue where messages might overlap */
+        }
+        .chatbox-body::after {
+        content: "";
+        display: table;
+        clear: both;
+        }
+        .chatbox-body > div p {
+        margin-bottom: 0;
+        }
+        .messager_name {
+        text-transform: uppercase;
+        font-size: 14px;
+        color: var(--p);
+        }
+        .message {
+        font-size: 16px;
+        color: #222;
+        }
+        .chatbox-footer {
+        padding: 10px;
+        border-top: 1px solid var(--l);
+        }.send_sms button{
+        background-color: transparent!important;
+        }.send_sms button:hover{
+        background-color: transparent!important;
+        }
+        .chat-input {
+        width: 100%;border: none;
+        outline: none;
+        border: none !important;
+        }.chat-input:focus{
+        border: none;box-shadow: unset!important;
+        }
+        .messages_main {
+        position: fixed;
+        bottom: 50px;
+        right: 110px;
+        }.message_num{
+        position: absolute;
+        background-color: rgb(185, 3, 3);color: #fff;font-size: 13px;border-radius: 20px;
+        height: 23px;
+        width: 23px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: -10px;;right: -10px;;
+        }.messages_main{
+        display: none;
+        }  .fixed-bottom-middle {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050;
+        }
+     </style>
    </head>
    <body>
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
@@ -159,23 +197,30 @@
          <div class="mic" onclick="speak()"><i class="fi fi-rr-circle-microphone"></i></div>
       </div>
       <div class="messages_main">
-         <div class="chatbox-container">
-            <div class="chatbox-header">
-               <h5>{{collab_id}}</h5>
-            </div>
-            <div class="chatbox-body">
-               <!-------------------------MESSAGES GOES HERE ---------------------------->
-            </div>
-            <div class="chatbox-footer">
-               <form class="send_sms">
-                  <div class="input-group">
-                     <input type="text" class="form-control chat-input" placeholder="Type a message" required>
-                     <button class="btn btn-primary" type="submit">Send</button>
-                  </div>
-               </form>
-            </div>
-         </div>
-      </div>
+        <div class="chatbox-container">
+           <div class="chatbox-header">
+              <div class="users">
+                 <div class="ava"><i class="fi fi-rr-user"></i></div>
+                 <div class="ava"><i class="fi fi-rr-user"></i></div>
+                 <div class="ava"><i class="fi fi-rr-user"></i></div>
+                 <div class="ava"><i class="fi fi-rr-user"></i></div>
+              </div>
+              <h5>{{collab_id}}</h5>
+              <p><span>232</span> Participants Joined!</p>
+           </div>
+           <div class="chatbox-body">
+              <!-------------------------MESSAGES GOES HERE ---------------------------->
+           </div>
+           <div class="chatbox-footer">
+              <form class="send_sms">
+                 <div class="input-group">
+                    <input type="text" class="form-control chat-input" placeholder="Type a message" required>
+                    <button class="btn btn-primary" type="submit"><i class="fi fi-rr-paper-plane-top"></i></button>
+                 </div>
+              </form>
+           </div>
+        </div>
+     </div>
       <p class="fill" hidden>transparent</p>
       <p class="stroke" hidden>#000000</p>
       <p class="stroke_" hidden>1</p>
