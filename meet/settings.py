@@ -45,7 +45,7 @@ CHANNEL_LAYERS = {
 }
 ROOT_URLCONF = 'meet.urls'
 CSRF_TRUSTED_ORIGINS = [
-    "https://f46c-115-99-66-210.ngrok-free.app",
+    "https://1e04-27-5-101-55.ngrok-free.app",
 ]
 TEMPLATES = [
     {

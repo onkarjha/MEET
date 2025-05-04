@@ -12,5 +12,8 @@
    to stop :- docker stop <id>
 
 3. Run on other device
+sudo systemctl enable redis-server
+sudo systemctl start redis-server
+
 
    daphne -b 0.0.0.0 -p 8000 meet.asgi:application

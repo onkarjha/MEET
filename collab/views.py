@@ -76,6 +76,6 @@ def check4create(request):
             return render(request, 'create_collab.html', {'isLogged':isLogged})
         else:
             return redirect('../../auth/login') 
-def host(request):
+def host(request): 
     print(request.session.get('collab_id', False))
     return render(request,"host.html",{'collab_id':request.session.get('collab_id', False),'sender':request.session.get('lemail', False),'sender_name':request.session.get('lname',False)})

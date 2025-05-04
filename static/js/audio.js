@@ -1,144 +1,214 @@
 const wsProtocol = location.protocol === "https:" ? "wss://" : "ws://";
-const chatSocket = new WebSocket(`${wsProtocol}${location.host}/ws/chat/`);
+const roomName = $(".collab_id").text();
+const chatSocket = new WebSocket(`${wsProtocol}${location.host}/ws/chat/${roomName}/`);
 
 let localStream = null;
-const peerConnections = {}; // key: sender ID, value: RTCPeerConnection
+const peerConnections = {};
 const pendingCandidates = {};
 
+const myId = Math.floor((Math.random() * 1000000) + 1);
+console.log("MY ID:", myId);
+
 async function setupLocalMedia() {
-  if (localStream) return localStream;
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-    const myVideo = document.createElement("video");
-    myVideo.srcObject = localStream;
-    myVideo.autoplay = true;
-    myVideo.muted = true;
-    document.getElementById("myid").appendChild(myVideo);
-    return localStream;
-  } catch (e) {
-    console.error("Error accessing media:", e);
-    alert("Cannot access camera/mic.");
-  }
+    if (localStream) return localStream;
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        });
+        const myVideo = document.createElement("video");
+        myVideo.srcObject = localStream;
+        myVideo.autoplay = true;
+        myVideo.muted = true;
+        myVideo.className = "onkar_user_video";
+        document.getElementById("myid").appendChild(myVideo);
+        return localStream;
+    } catch (e) {
+        console.error("Error accessing media:", e);
+        alert("Cannot access camera/mic.");
+    }
 }
 
 function createPeerConnection(peerId) {
-  const pc = new RTCPeerConnection({
-    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-  });
+    const pc = new RTCPeerConnection({
+        iceServers: [{
+            urls: "stun:stun.l.google.com:19302"
+        }]
+    });
 
-  pc.onicecandidate = (event) => {
-    if (event.candidate) {
-      sendMessage({
-        shape: "candidate",
-        message: {
-          sender: myId,
-          target: peerId,
-          message: event.candidate,
-          collab_id: $(".collab_id").text(),
+    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+    pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            sendMessage({
+                shape: "candidate",
+                message: {
+                    sender: myId,
+                    target: peerId,
+                    candidate: event.candidate,
+                    collab_id: roomName,
+                }
+            });
         }
-      });
-    }
-  };
+    };
 
-  pc.ontrack = (event) => {
-    let video = document.getElementById(`video_${peerId}`);
-    if (!video) {
-      video = document.createElement("video");
-      video.id = `video_${peerId}`;
-      video.autoplay = true;
-      document.getElementById("remote_videos").appendChild(video);
-    }
-    video.srcObject = event.streams[0];
-  };
+    pc.ontrack = (event) => {
+        let video = document.getElementById(`video_${peerId}`);
+        if (!video) {
+            video = document.createElement("video");
+            video.id = `video_${peerId}`;
+            video.autoplay = true;
+            video.className = "onkar_user_video";
+            const wrapper = document.createElement("div");
+            wrapper.className = "onkar_user_video_container";
+            wrapper.appendChild(video);
+            document.getElementById("remote_videos").appendChild(wrapper);
+        }
+        video.srcObject = event.streams[0];
+    };
 
-  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-  return pc;
+    if (pendingCandidates[peerId]) {
+        pendingCandidates[peerId].forEach(candidate => {
+            pc.addIceCandidate(new RTCIceCandidate(candidate));
+        });
+        delete pendingCandidates[peerId];
+    }
+
+    return pc;
+}
+
+function sendMessage(data) {
+    chatSocket.send(JSON.stringify(data));
 }
 
 async function broadcast() {
-  await setupLocalMedia();
-  sendMessage({ shape: "join", message: { sender: myId, collab_id: $(".collab_id").text(), } });
+    await setupLocalMedia();
+    sendMessage({
+        shape: "join",
+        message: {
+            sender: myId,
+            collab_id: roomName,
+        }
+    });
 }
 
 chatSocket.onmessage = async (e) => {
-  const data = JSON.parse(e.data);
-  const { shape, message } = data;
+    const data = JSON.parse(e.data);
+    const {
+        shape,
+        message
+    } = data;
+    const sender = message.sender;
+    const target = message.target;
 
-  const sender = message.sender;
-  const target = message.target;
-//message.collab_id === collab_id
-console.log("received : "+message.collab_id);
-console.log("my collab : "+collab_id);
-  if (sender === myId) return;
+    if (sender === myId) return;
 
-  if (shape === "join") {
-    const pc = createPeerConnection(sender);
-    peerConnections[sender] = pc;
+    if (shape === "user_list") {
 
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+        await setupLocalMedia();
+        message.users.forEach(async peerId => {
+            if (peerId !== myId && !peerConnections[peerId]) {
+                const pc = createPeerConnection(peerId);
+                peerConnections[peerId] = pc;
 
-    sendMessage({
-      shape: "rtc-offer",
-      message: {
-        sender: myId,
-        target: sender,
-        message: offer,
-        collab_id: $(".collab_id").text(),
-      }
-    });
-  }
+                if (myId > peerId) {
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+                    sendMessage({
+                        shape: "rtc-offer",
+                        message: {
+                            sender: myId,
+                            target: peerId,
+                            offer: offer,
+                            collab_id: roomName,
+                        }
+                    });
+                }
+            }
+        });
+    } else if (shape === "join") {
 
-  else if (shape === "rtc-offer") {
-    await setupLocalMedia();
-    const pc = createPeerConnection(sender);
-    peerConnections[sender] = pc;
+        await setupLocalMedia();
+        const peerId = sender;
+        if (!peerConnections[peerId]) {
+            const pc = createPeerConnection(peerId);
+            peerConnections[peerId] = pc;
 
-    await pc.setRemoteDescription(new RTCSessionDescription(message.message));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
+            if (myId > peerId) {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                sendMessage({
+                    shape: "rtc-offer",
+                    message: {
+                        sender: myId,
+                        target: peerId,
+                        offer: offer,
+                        collab_id: roomName,
+                    }
+                });
+            }
+        }
+    } else if (shape === "rtc-offer") {
+        await setupLocalMedia();
+        let pc = peerConnections[sender];
+        if (!pc) {
+            pc = createPeerConnection(sender);
+            peerConnections[sender] = pc;
+        }
+        await pc.setRemoteDescription(new RTCSessionDescription(message.offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        sendMessage({
+            shape: "rtc-answer",
+            message: {
+                sender: myId,
+                target: sender,
+                answer: answer,
+                collab_id: roomName,
+            }
+        });
+    } else if (shape === "rtc-answer") {
+        const pc = peerConnections[sender];
+        if (pc) {
+            await pc.setRemoteDescription(new RTCSessionDescription(message.answer));
+        }
+    } else if (shape === "candidate") {
+        const pc = peerConnections[sender];
+        if (pc) {
+            await pc.addIceCandidate(new RTCIceCandidate(message.candidate));
+        } else {
+            if (!pendingCandidates[sender]) pendingCandidates[sender] = [];
+            pendingCandidates[sender].push(message.candidate);
+        }
+    } else if (shape === "user_left") {
 
-    sendMessage({
-      shape: "rtc-answer",
-      message: {
-        sender: myId,
-        target: sender,
-        message: answer,
-        collab_id: $(".collab_id").text(),
-      }
-    });
-  }
-
-  else if (shape === "rtc-answer") {
-    const pc = peerConnections[sender];
-    if (pc) {
-      await pc.setRemoteDescription(new RTCSessionDescription(message.message));
-    }
-  }
-
-  else if (shape === "candidate") {
-    const pc = peerConnections[sender];
-    if (pc) {
-      await pc.addIceCandidate(new RTCIceCandidate(message.message));
+        const peerId = sender;
+        if (peerConnections[peerId]) {
+            peerConnections[peerId].close();
+            delete peerConnections[peerId];
+        }
+        const video = document.getElementById(`video_${peerId}`);
+        if (video) video.remove();
+    } else if (shape === "message") {
+        showAlert(`[${data.message.sender_name}] ${data.message.message}`);
+        $(".message_num").text(parseInt($(".message_num").text()) + 1);
+        init_0("message_num");
+        $(".chatbox-body").append(`<div class="received_message"><p class="messager_name">${data.message.sender_name}</p><p class="message">${data.message.message}</p></div>`);
+        $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
     } else {
-      if (!pendingCandidates[sender]) pendingCandidates[sender] = [];
-      pendingCandidates[sender].push(message.message);
+        console.log("Unhandled shape:", shape);
+        handleShapeData(data);
     }
-  }
-  else if (shape === "message"){
-    showAlert("[" + data.message.sender_name + "] " + data.message.message);
-                $(".message_num").text(parseInt($(".message_num").text()) + 1);
-                init_0("message_num");
-                $(".chatbox-body").append(' <div class="received_message"><p class="messager_name">' + data.message.sender_name + '</p><p class="message">' + data.message.message + '</p></div>');
-                $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
-  }
-  else {
-    handleShapeData(data);
-  }
 };
 
-function sendMessage(data) {
-  chatSocket.send(JSON.stringify(data));
-}
+setInterval(() => {
 
-const myId = Math.floor(Math.random() * 100000).toString(); // use UUID or auth ID in real case
+    const containers = document.querySelectorAll('.onkar_user_video_container');
+
+    containers.forEach(container => {
+
+        if (container.children.length === 0) {
+            container.remove();
+        }
+    });
+}, 10000);
