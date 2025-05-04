@@ -9,7 +9,7 @@ SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['meet-82mk.onrender.com','localhost','127.0.0.1','*']
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -44,7 +44,9 @@ CHANNEL_LAYERS = {
     },
 }
 ROOT_URLCONF = 'meet.urls'
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://f46c-115-99-66-210.ngrok-free.app",
+]
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

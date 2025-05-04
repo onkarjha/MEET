@@ -17,8 +17,8 @@ def send_email(to_email):
     random_number = random.randint(100000, 999999)
     smtp_server = 'smtp.hostinger.com'
     smtp_port = 587
-    sender_email = 'admin@lsfagrisolution.com'
-    sender_password = '#LSFAgrisolution1' 
+    sender_email = 'test@nextgenscminc.com'
+    sender_password = '12@#ABcd12@#ABcd' 
 
     # Create the email
     msg = MIMEMultipart()

@@ -3,24 +3,25 @@
       {% include 'head.html' %}
       <title>Collaborate - {{collab_id}}</title>
       <style>
+        
         .canvas-container{
         background-color: #fff;
         }.more_options{
-        position: fixed;
-        bottom: 20px;
-        right:30px;
-        padding: 20px;
-        border-radius: 50px;
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-        z-index: 1000;
-        border:1px solid var(--l)
+            position: fixed;
+    bottom: 150px;
+    right: 10px;
+    padding: 10px;
+    border-radius: 50px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    z-index: 1000;
+    border: 1px solid var(--l);
         }
         .more_options i{
         cursor: pointer;
-        font-size: 30px;
+        font-size: 15px;
         }.more_options >div{
-        margin-top: 20px;
-        margin-bottom: 20px;;
+        margin-top: 10px;
+        margin-bottom: 10px;;
         }   .chatbox-container {
         width: 350px;
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
@@ -151,9 +152,62 @@
         transform: translateX(-50%);
         z-index: 1050;
         }
+        /*****************/
+        .v-{
+            position: fixed;
+    /* top: 200px; */
+    /* display: flex
+; */
+overflow-x: auto;
+display: flex;
+    z-index: 200000;
+    bottom: 0px;
+    background: #ffffff;
+    /* left: 100px; */
+    padding: 5px;
+    width: 100%;
+    box-shadow: rgb(0 0 0 / 41%) 0px 1px 4px;
+    overflow: auto;
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none; 
+        }
+        .v-::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, and Opera */
+}#myid{
+            min-width: 180px;
+    height: 100px;
+    border-radius: 5px;
+    background: #777777;
+        }#myid video{
+            margin-left: 0;
+        }
+        video{
+            margin-left: 10px;
+    width: 180px;
+    height: 100px;
+    border-radius: 5px;
+    background: #777777;
+        }#remote_videos {
+display: flex;
+        }
+        /* #hisid{
+          background-color: blue;
+        } */
      </style>
    </head>
    <body>
+    <!---------------- temp-->
+<div class="v-">
+  <div id="myid"></div>
+  <!-- <video id="hisid" autoplay playsinline style="width: 100%; max-width: 600px; background: black;"></video> -->
+  <div id="remote_videos">
+    
+  </div>
+</div>
+    
+
+
+    <!--------------------------->
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
       <div class="tools">
          <div title="square"><i class="fi fi-rr-square"></i></div>
@@ -200,8 +254,8 @@
             <div class="message_num">0</div>
             <i class="fi fi-rr-messages"></i>
          </div>
-         <div><i class="fi fi-rr-users-alt"></i></div>
-         <div class="mic" onclick="speak()"><i class="fi fi-rr-circle-microphone"></i></div>
+         <div onclick="toggleVideos()"><i class="fi fi-rr-users-alt"></i></div>
+         <div class="mic" onclick="broadcast()"><i class="fi fi-rr-circle-microphone"></i></div>
       </div>
       <div class="messages_main">
         <div class="chatbox-container">
@@ -237,232 +291,216 @@
       <div id="alert" class="alert alert-success fixed-bottom-middle" role="alert" style="display: none;">
          <!-- Dynamic content will be inserted here -->
       </div>
-      <script>
-        if (window.innerWidth <= 700) {
-    // Clear the body content
+  
+   
+<script>
+  if (window.innerWidth <= 700) {
     document.body.innerHTML = "";
-    
-    // Add a message
     const messageDiv = document.createElement("div");
     messageDiv.style.display = "flex";
     messageDiv.style.alignItems = "center";
     messageDiv.style.justifyContent = "center";
-    messageDiv.style.height = "100vh"; // Ensure the div takes full screen height
+    messageDiv.style.height = "100vh"; 
     messageDiv.textContent = "INCOMPATIBLE SCREEN SIZE :(";
     document.body.appendChild(messageDiv);
 }
+function toggleVideos(){
+    $(".v-").toggle();
+}
+function showAlert(message) {
+    var alertElement = document.getElementById('alert');
+    alertElement.innerHTML = message;
+    alertElement.style.display = 'block';
+    setTimeout(function() {
+        alertElement.style.display = 'none';
+    }, 3000);
+}
 
-      </script>
-      <script>
-         function showAlert(message) {
-             var alertElement = document.getElementById('alert');
-             alertElement.innerHTML = message;
-             alertElement.style.display = 'block';
-             setTimeout(function() {
-                 alertElement.style.display = 'none';
-             }, 3000);
-         }function init_0(text){
-           if($("."+text).text()==0){
-             $("."+text).css({"visibility":"hidden"});
-           }else{
-             $("."+text).css({"visibility":"visible"});
-           }
-         }
-         function message__(){$(".message_num").text(0);
-           $(".messages_main").toggle(100);init_0("messages_main");
-         }
-         init_0("message_num");
-         $(document).ready(function(){
-         $(".send_sms").on('submit',function(e){
-         e.preventDefault();
-         var mess=$(".chat-input").val();
-         $(".chatbox-body").append(' <div class="sent_message"><p class="message">'+mess+'</p></div>');
-         $(this)[0].reset();      $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
-         sendMessage({
-                 'message': {
-                     collab_id: $(".collab_id").text(),
-                     sender: $(".sender").text(),
-                     sender_name:$(".sender_name").text(),
-                     message:mess,
-                     
-                 },
-                 'shape': 'message'
-             });
-         });
-         });
-      </script>
-      <script>
-         function findObjectById(id) {
-           return canvas.getObjects().find(obj => obj.id === id);
-         }
-         
-         function updateShapeData(id, newData) {
-           const obj = findObjectById(id);
-           if (obj) {
-             obj.set(newData); // Update the shape's data
-             obj.setCoords();   // Recalculate the coordinates of the object's bounding box
-             canvas.renderAll(); // Rerender the canvas to reflect the changes
-           } else {
-             console.error("NOT FOUND : " + id);
-           }
-         }
-         
-         function handleShapeData(data) {
-           const { message } = data;
-           let radius = message.radius === undefined ? 50 : message.radius;
-         
-           const shapeConfig = {
-             id: message.id,
-             left: message.left,
-             top: message.top,
-             angle: message.angle,
-             fill: message.fill,
-             stroke: message.stroke,
-             strokeWidth: message.strokeWidth,
-             width: message.width,
-             height: message.height,
-             radius: radius,
-            
-            
-           };
-         
-         
-           let shapeType = data.shape === "rect" ? "square" : data.shape;
-         
-           switch (shapeType) {
-             case "square":
-               if (message.type === "NEW") {
-                 canvas.isDrawingMode = false;
-                 canvas.add(new fabric.Rect(shapeConfig));
-               } else {
-                 updateShapeData(message.id, shapeConfig);
-               }
-               break;
-         
-             case "circle":
-               if (message.type === "NEW") {
-                 canvas.isDrawingMode = false;
-                 canvas.add(new fabric.Circle(shapeConfig));
-               } else {
-                 updateShapeData(message.id, shapeConfig);
-               }
-               break;
-         
-               case "triangle":
-               if (message.type === "NEW") {
-                 canvas.isDrawingMode = false;
-                 canvas.add(new fabric.Triangle(shapeConfig));
-               } else {
-                 updateShapeData(message.id, shapeConfig);
-               }
-               break;
-               case "delete":
-               if (message.type === "delete") {
-                 canvas.remove(findObjectById(message.id));
-                         canvas.discardActiveObject();
-                         canvas.renderAll();
-                 
-               } 
-               break;
-               case "font":
-               
-               if (message.type_ === "NEW") {
-                 canvas.add(new fabric.Textbox('TEXT HERE', {
-                         left: message.left,
-                         top: message.top,
-                         width: message.width,
-                         fontSize: message.fontSize,
-                         editable: message.editable,
-                         backgroundColor: message.backgroundColor,
-                         borderColor: message.borderColor,
-                         fontFamily: message.fontFamily,
-                         fill: message.fill,
-                         id: message.id,
-                     }));
-               } else {
-                 var obj = findObjectById(message.id);
-           if (obj) {
-             obj.set({text:message.text}); 
-             obj.setCoords();   
-             canvas.renderAll(); 
-           } else {}
-               }
-               break;
-               case "path":
-               if (message.type === "NEW") {
-                
-             const pathData = message.data.path;  
-             const fillColor = message.data.fill; 
-             const strokeColor = message.data.stroke;  
-             const strokeWidth = message.data.strokeWidth; 
-             const pathId = message.data.id; 
-             var da={
-                 fill: fillColor,  // Set the fill color
-                 stroke: strokeColor,  // Set the stroke color
-                 strokeWidth: strokeWidth,  // Set the stroke width
-                 id: pathId,  // Set the ID (optional)
-             };
-             const path = new fabric.Path(pathData, da);
-         
-             
-             canvas.add(path);
-             canvas.renderAll();  
-             
-             
-           }else{
-             updateShapeData(message.id, shapeConfig);
-           }
-             break;
-               case "textbox":
-                 updateShapeData(message.id, shapeConfig);
-                 break;
-             default:
-               console.error("Unsupported shape type:", data.shape);
-           }
-         }
-         
-         const collab_id = $(".collab_id").text();
-         const sender = $(".sender").text();
-         
-         if (sender === "False") {
-           alert("You are not logged in!");
-           window.location.href = `${window.location.protocol}//${window.location.host}/auth/login`;
-         } else if (collab_id === "False") {
-           alert("Please Provide Collab ID and Password to join!");
-           window.location.href = `${window.location.protocol}//${window.location.host}/collab/check`;
-         }
-         
-         const wsProtocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-         const chatSocket = new WebSocket(`${wsProtocol}${window.location.host}/ws/chat/`);
-         
-         chatSocket.onmessage = function (e) {
-           const data = JSON.parse(e.data);
-         
-           if (data.message) {
-             if (data.message.sender === sender) {
-         
-             } else if(data.message.collab_id === collab_id){
-               if(data.shape=="message"){
-                 showAlert("["+data.message.sender_name+"] "+data.message.message);
-                 $(".message_num").text(parseInt($(".message_num").text()) + 1);
-                 init_0("message_num");
-                 $(".chatbox-body").append(' <div class="received_message"><p class="messager_name">'+data.message.sender_name+'</p><p class="message">'+data.message.message+'</p></div>');
-                     $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
-                       }else{
-               handleShapeData(data);}
-             }
-           }
-         };
-         chatSocket.onerror = (error) => {
-         $("body").append(' <div class="socketError"><p class="alert alert-danger">Unable to connect to Socket :(</p></div>');
-         };
-         
-         function sendMessage(data) {
-           chatSocket.send(JSON.stringify(data));
-         }
-         
-               
-      </script>
+function init_0(text) {
+    if ($("." + text).text() == 0) {
+        $("." + text).css({
+            "visibility": "hidden"
+        });
+    } else {
+        $("." + text).css({
+            "visibility": "visible"
+        });
+    }
+}
+
+function message__() {
+    $(".message_num").text(0);
+    $(".messages_main").toggle(100);
+    init_0("messages_main");
+}
+init_0("message_num");
+$(document).ready(function() {
+    $(".send_sms").on('submit', function(e) {
+        e.preventDefault();
+        var mess = $(".chat-input").val();
+        $(".chatbox-body").append(' <div class="sent_message"><p class="message">' + mess + '</p></div>');
+        $(this)[0].reset();
+        $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
+        sendMessage({
+            'message': {
+                collab_id: $(".collab_id").text(),
+                sender: $(".sender").text(),
+                sender_name: $(".sender_name").text(),
+                message: mess,
+
+            },
+            'shape': 'message'
+        });
+    });
+});
+</script>
+<script>
+  function findObjectById(id) {
+    return canvas.getObjects().find(obj => obj.id === id);
+}
+
+function updateShapeData(id, newData) {
+    const obj = findObjectById(id);
+    if (obj) {
+        obj.set(newData); // Update the shape's data
+        obj.setCoords(); // Recalculate the coordinates of the object's bounding box
+        canvas.renderAll(); // Rerender the canvas to reflect the changes
+    } else {
+        console.error("NOT FOUND : " + id);
+    }
+}
+
+function handleShapeData(data) {
+    const {
+        message
+    } = data;
+    let radius = message.radius === undefined ? 50 : message.radius;
+
+    const shapeConfig = {
+        id: message.id,
+        left: message.left,
+        top: message.top,
+        angle: message.angle,
+        fill: message.fill,
+        stroke: message.stroke,
+        strokeWidth: message.strokeWidth,
+        width: message.width,
+        height: message.height,
+        radius: radius,
+
+
+    };
+
+
+    let shapeType = data.shape === "rect" ? "square" : data.shape;
+
+    switch (shapeType) {
+        case "square":
+            if (message.type === "NEW") {
+                canvas.isDrawingMode = false;
+                canvas.add(new fabric.Rect(shapeConfig));
+            } else {
+                updateShapeData(message.id, shapeConfig);
+            }
+            break;
+
+        case "circle":
+            if (message.type === "NEW") {
+                canvas.isDrawingMode = false;
+                canvas.add(new fabric.Circle(shapeConfig));
+            } else {
+                updateShapeData(message.id, shapeConfig);
+            }
+            break;
+
+        case "triangle":
+            if (message.type === "NEW") {
+                canvas.isDrawingMode = false;
+                canvas.add(new fabric.Triangle(shapeConfig));
+            } else {
+                updateShapeData(message.id, shapeConfig);
+            }
+            break;
+        case "delete":
+            if (message.type === "delete") {
+                canvas.remove(findObjectById(message.id));
+                canvas.discardActiveObject();
+                canvas.renderAll();
+
+            }
+            break;
+        case "font":
+
+            if (message.type_ === "NEW") {
+                canvas.add(new fabric.Textbox('TEXT HERE', {
+                    left: message.left,
+                    top: message.top,
+                    width: message.width,
+                    fontSize: message.fontSize,
+                    editable: message.editable,
+                    backgroundColor: message.backgroundColor,
+                    borderColor: message.borderColor,
+                    fontFamily: message.fontFamily,
+                    fill: message.fill,
+                    id: message.id,
+                }));
+            } else {
+                var obj = findObjectById(message.id);
+                if (obj) {
+                    obj.set({
+                        text: message.text
+                    });
+                    obj.setCoords();
+                    canvas.renderAll();
+                } else {}
+            }
+            break;
+        case "path":
+            if (message.type === "NEW") {
+
+                const pathData = message.data.path;
+                const fillColor = message.data.fill;
+                const strokeColor = message.data.stroke;
+                const strokeWidth = message.data.strokeWidth;
+                const pathId = message.data.id;
+                var da = {
+                    fill: fillColor, // Set the fill color
+                    stroke: strokeColor, // Set the stroke color
+                    strokeWidth: strokeWidth, // Set the stroke width
+                    id: pathId, // Set the ID (optional)
+                };
+                const path = new fabric.Path(pathData, da);
+
+
+                canvas.add(path);
+                canvas.renderAll();
+
+
+            } else {
+                updateShapeData(message.id, shapeConfig);
+            }
+            break;
+        case "textbox":
+            updateShapeData(message.id, shapeConfig);
+            break;
+        default:
+            console.error("Unsupported shape type:", data.shape);
+    }
+}
+
+const collab_id = $(".collab_id").text();
+const sender = $(".sender").text();
+
+if (sender === "False") {
+    alert("You are not logged in!");
+    window.location.href = `${window.location.protocol}//${window.location.host}/auth/login`;
+} else if (collab_id === "False") {
+    alert("Please Provide Collab ID and Password to join!");
+    window.location.href = `${window.location.protocol}//${window.location.host}/collab/check`;
+}
+</script>
+
+ 
       {% include 'footer.html' %}
    </body>
 </html>
