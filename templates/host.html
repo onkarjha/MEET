@@ -3,6 +3,12 @@
       {% include 'head.html' %}
       <title>Collaborate - {{collab_id}}</title>
       <style>
+         /* *{
+         cursor: none!important;
+         } */
+         body{
+         overflow: hidden;
+         }
          .canvas-container{
          background-color: #fff;
          }.more_options{
@@ -22,9 +28,10 @@
          margin-top: 10px;
          margin-bottom: 10px;;
          }   .chatbox-container {
-         width: 500px;
+         width: 300px;
          box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
          overflow: hidden;
+         border-radius:10px;
          background-color: #fff;
          }.chatbox-header>h5{
          color: #fff!important;margin-bottom: 0;
@@ -32,13 +39,42 @@
          color: #fff;font-size: 14px;margin-top: 5px;
          }
          .chatbox-header {
-         background-color: var(--p);height: 150px;;display: flex;
+         height: 70px;
+         box-shadow: rgb(0 0 0 / 8%) 1.95px 1.95px 2.6px;
+         padding: 10px;;
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         }.chat-left,.group-info{
+         display: flex;
+         align-items: center;
+         }.chat-right{
+         height:50px;
+         width: 50px;
+         display: flex;
          align-items: center;
          justify-content: center;
-         flex-direction: column;
+         cursor: pointer;
+         }.group_make_flex{
+         display: flex;align-items: center;
+         } .group_make_flex >span{
+         margin-left: 3px;;
+         }.group_make_flex >span:nth-child(1){
+         margin-left: 10px;
+         }.mycollabid{
+         margin-left: 10px;
+         color: #222 !important;
+         font-weight: bold;
+         font-size: 15px !important;
+         }
+         .chatbox-header img{
+         height:50px;
+         width:50px;
+         /* border:1px solid var(--p);
+         border-radius: 50px;; */
          }
          .chatbox-header:before {
-         background-image: url('https://client.crisp.chat/static/images/tiles/signal.svg') !important;
+         /* background-image: url('https://client.crisp.chat/static/images/tiles/signal.svg') !important;
          background-size: 72px !important;
          opacity: 0.075 !important;
          height: 150px;
@@ -46,36 +82,47 @@
          background-repeat: repeat !important;
          position: absolute !important;
          inset: 0 !important;
-         z-index: 0 !important;
+         z-index: 0 !important; */
          }
          .users{
-         display: flex;margin-bottom: 10px;
+         /* display: flex;margin-bottom: 10px; */
          }.users .ava {
-         width: 40px;
+         /* width: 40px;
          height: 40px;
          border-radius: 50%;
          border: 2px solid var(--p);background-color: #fff;
          padding: 5px;
-         margin-left: -10px; /* Overlap effect */
+         margin-left: -10px;
          z-index: 1;display: flex;
          align-items: center;
-         justify-content: center;
+         justify-content: center; */
          }.ava{
          }
          .users .ava:first-child {
-         margin-left: 0; /* Reset margin for the first avatar */
+         /* margin-left: 0; Reset margin for the first avatar */
          }
          .chatbox-body {
          padding: 10px;
-         height: calc(100vh - 210px);
+         height:300px;
          overflow-y: auto;
          }
          .chatbox-body > div {
          max-width: 80%;
          padding: 5px 10px;
          display: table;
-         margin-bottom: 10px;
-         border-radius: 7px;
+         margin-bottom: 3px;
+         border-radius: 5px;
+         }.messages_main input{
+         background: #efefef96;
+         font-size: 14px;
+         border-radius: 50px;
+         border-top-right-radius:50px!important;
+         border-bottom-right-radius:50px!important;
+         }.messages_main input:focus{
+         background: #efefef96;
+         border:1px solid var(--p);
+         }.messages_main button i{
+         color:#fff;
          }
          .sent_message {
          float: right;
@@ -103,16 +150,29 @@
          color: var(--p);
          }
          .message {
-         font-size: 16px;
+         font-size: 14px;
          color: #222;
+         }.online_now{
+         width:10px;
+         height: 10px;
+         background-color: #0CCE6B;border-radius: 50px;
+         display: block;
+         }.part,.part_text{
+         color: #444 !important;
          }
          .chatbox-footer {
          padding: 10px;
          border-top: 1px solid var(--l);
+         height: 50px;
          }.send_sms button{
-         background-color: transparent!important;
-         }.send_sms button:hover{
-         background-color: transparent!important;
+         height: 30px;
+         width: 30px;
+         display: flex;
+         border-radius: 50px!important;
+         align-items: center;
+         margin-left: 10px!important;
+         background: var(--p) !important;
+         justify-content: center;
          }
          .chat-input {
          width: 100%;border: none;
@@ -123,9 +183,9 @@
          }
          .messages_main {
          position: fixed;
-         bottom: 0;
-         right: 0;
-         height: 100vh;
+         bottom: 30px;
+         height: 420px !important;    z-index: 99999999;
+         right: 30px;
          }.message_num{
          position: absolute;
          background-color: rgb(185, 3, 3);color: #fff;font-size: 13px;border-radius: 20px;
@@ -140,9 +200,17 @@
          }  .fixed-bottom-middle {
          position: fixed;
          bottom: 20px;
+         border: none;
          left: 50%;
          transform: translateX(-50%);
          z-index: 1050;
+         background: #fff;
+         border-radius: 30px;
+         height: 30px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         box-shadow: rgba(14, 63, 126, 0.04) 0px 0px 0px 1px, rgba(42, 51, 69, 0.04) 0px 1px 1px -0.5px, rgba(42, 51, 70, 0.04) 0px 3px 3px -1.5px, rgba(42, 51, 70, 0.04) 0px 6px 6px -3px, rgba(14, 63, 126, 0.04) 0px 12px 12px -6px, rgba(14, 63, 126, 0.04) 0px 24px 24px -12px;
          }
          .socketError {
          position: fixed;
@@ -163,11 +231,13 @@
          left: 50%;
          transform: translate(-50% , -50%);
          height: 0;
-         width: 0%;z-index: 999;display: none;
+         width: 0%;z-index: -10000;
          }
          .onkar_users{
-         width:70%;
-         height: 80vh;
+         width: 70%;
+         height: auto;
+         max-width:80%;
+         max-height: 80vh;
          border-radius: 10px;
          background-color: #fff;
          position: absolute;
@@ -177,7 +247,7 @@
          }.onkar_users_{
          position: relative;
          width: 100%;
-         height: 100%;
+         height: 80vh;
          background-color: #fff;
          border-radius: 10px;
          }#onkar_user_close{
@@ -213,6 +283,7 @@
          display: flex;
          align-items: center;
          justify-content: center;
+         z-index:999999;
          }.video_off,.mic_off,.video_pin{
          min-width: 40px;
          min-height: 40px;
@@ -245,20 +316,26 @@
          margin-bottom: 0;
          }
          .pin_video_here_and_draggable{
-            width:200px;
-            height:130px;
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            z-index: 10000;
-            background-color: #000;
-            border-radius: 5px;;
-            
+         width:200px;
+         height:130px;
+         position: fixed;
+         right: 20px;
+         bottom: 20px;
+         z-index: 10000;
+         background-color: #000;
+         border-radius: 5px;;
          }.pin_video_here_also{
-            height: 300px;
-            width: 100%;;
-            background-color: #000;
-            border-radius: 5px;;
+         height: 300px;
+         width: 100%;;
+         background-color: #000;
+         border-radius: 5px;;
+         }    .custom-cursor {
+         position: absolute;
+         width: 20px;
+         height: 20px;z-index:9999999999999;
+         background: url("../static/images/cursor.png") no-repeat center center; /* Replace with your cursor image URL */
+         background-size: contain;
+         pointer-events: none;
          }
       </style>
       <script>
@@ -268,7 +345,7 @@
          { width: "0", height: "0" }, 
          300,
          function() {
-         $(this).hide();
+         $(this).css({"z-index":"-10000"});
          }
          );
          });
@@ -277,7 +354,7 @@
          { width: "100%", height: "100vh" }, 
          300,
          function() {
-         $(this).show();
+            $(this).css({"z-index":"999"});
          }
          );
          });
@@ -286,6 +363,15 @@
       </script>
    </head>
    <body>
+      <!-- <div class="custom-cursor" id="cursor"></div>
+      <script>
+         const cursor = document.getElementById('cursor');
+         
+         document.addEventListener('mousemove', (e) => {
+           cursor.style.left = `${e.pageX}px`;
+           cursor.style.top = `${e.pageY}px`;
+         });
+      </script> -->
       <!---------------- temp-->
       <!-- <div class="pin_video_here_and_draggable"></div> -->
       <div class="onkar_main_video_outer_container">
@@ -309,10 +395,9 @@
                         </div>
                         <!-- <div class="video_pin pin_me">
                            <i class="fi fi-rr-thumbtack"></i>
-                        </div> -->
+                           </div> -->
                      </div>
                   </div>
-                 
                </div>
             </div>
          </div>
@@ -321,6 +406,7 @@
       <input hidden value="{{sender_name}}" class="user_name">
       <canvas id="canvas" style="position: relative;" height="600" width="700"></canvas>
       <div class="tools">
+         <div title="change"><i class="fi fi-rr-arrows"></i></div>
          <div title="square"><i class="fi fi-rr-square"></i></div>
          <div title="circle"><i class="fi fi-rr-circle"></i></div>
          <div title="triangle"><i class="fi fi-rr-triangle"></i></div>
@@ -377,14 +463,30 @@
       <div class="messages_main">
          <div class="chatbox-container">
             <div class="chatbox-header">
-               <div class="users">
+               <!-- <div class="users">
                   <div class="ava"><i class="fi fi-rr-user"></i></div>
                   <div class="ava"><i class="fi fi-rr-user"></i></div>
                   <div class="ava"><i class="fi fi-rr-user"></i></div>
                   <div class="ava"><i class="fi fi-rr-user"></i></div>
+                  </div>
+                  <h5>Collab - {{collab_id}}</h5>
+                  <p><span class="edit_no_of">0</span> Participants Joined!</p> -->
+               <div class="chat-left">
+                  <div class="group-info">
+                     <img src="https://cdn-icons-png.flaticon.com/256/9821/9821327.png">
+                     <div>
+                        <span class="mycollabid">Collab - {{collab_id}}</span>
+                        <div class="group_make_flex">
+                           <span class="online_now"></span>
+                           <span class="part">0</span>
+                           <span class="part_text">Participants</span>
+                        </div>
+                     </div>
+                  </div>
                </div>
-               <h5>Collab - {{collab_id}}</h5>
-               <p><span class="edit_no_of">0</span> Participants Joined!</p>
+               <div class="chat-right" onclick="closeChat()">
+                  <i class="fi fi-rr-cross-small"></i>
+               </div>
             </div>
             <div class="chatbox-body">
                <!-------------------------MESSAGES GOES HERE ---------------------------->
@@ -612,7 +714,10 @@
            alert("Please Provide Collab ID and Password to join!");
            window.location.href = `${window.location.protocol}//${window.location.host}/collab/check`;
          }
-      </script>
-      {% include 'footer.html' %}
-   </body>
+         function closeChat(){
+            $(".messages_main").hide();
+         }
+</script>
+{% include 'footer.html' %}
+</body>
 </html>
