@@ -181,7 +181,7 @@ chatSocket.onmessage = async (e) => {
             pendingCandidates[sender].push(message.candidate);
         }
     } else if (shape === "user_left") {
-
+        
         const peerId = sender;
         if (peerConnections[peerId]) {
             peerConnections[peerId].close();
@@ -201,6 +201,36 @@ chatSocket.onmessage = async (e) => {
     }
 };
 
+function toggleMic() {
+    if (!localStream) return;
+    const audioTrack = localStream.getAudioTracks()[0];
+    if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        audioTrack.enabled ? $(".mic_off").css({"background":"#000"}) : $(".mic_off").css({"background":"red"});
+    }
+}
+function toggleCamera() {
+    if (!localStream) return;
+    const videoTrack = localStream.getVideoTracks()[0];
+    if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        videoTrack.enabledapplication ? $(".video_off").css({"background":"#000"}) : $(".video_off").css({"background":"red"});
+    }
+}
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 setInterval(() => {
 
     const containers = document.querySelectorAll('.onkar_user_video_container');

@@ -24,7 +24,6 @@
          }   .chatbox-container {
          width: 500px;
          box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-         
          overflow: hidden;
          background-color: #fff;
          }.chatbox-header>h5{
@@ -123,10 +122,10 @@
          border: none;box-shadow: unset!important;
          }
          .messages_main {
-            position: fixed;
-  bottom: 0;
-  right: 0;
-  height: 100vh;
+         position: fixed;
+         bottom: 0;
+         right: 0;
+         height: 100vh;
          }.message_num{
          position: absolute;
          background-color: rgb(185, 3, 3);color: #fff;font-size: 13px;border-radius: 20px;
@@ -154,7 +153,6 @@
          }
          /*****************/
          video{
-       
          width: inherit;
          height: inherit;
          border-radius: 5px;object-fit: cover;
@@ -197,17 +195,70 @@
          }.remote_videos{
          overflow-y:auto;
          padding: 20px;
-         display: flex;
-         flex-wrap: wrap;
-         justify-content: center;
-         align-items: center;
-         gap: 20px;height: 100%;
+         max-height: 100%;
+         display: grid;
+         grid-template-columns: repeat(auto-fit, 300px);
+         gap: 1rem;
+         justify-content: center; 
          }.onkar_user_video_container{
          background-color: #cfcfcf;
          width:300px;
          height:200px;
          border-radius: 5px;;
          position: relative;
+         }.my_video_options{
+         position: absolute;
+         width: 100%;
+         bottom: 10px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         }.video_off,.mic_off,.video_pin{
+         min-width: 40px;
+         min-height: 40px;
+         background-color: #000;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         margin-left: 10px;
+         margin-right: 10px;
+         border-radius: 50px;
+         cursor: pointer;
+         }.video_off i ,.mic_off i,.video_pin i{
+         color: #fff;
+         font-size: 13px;
+         }.caller_name{
+         height: 40px;
+         background-image: linear-gradient(#00000069, #fff0);
+         position: absolute;
+         top: 0;
+         left: 0;
+         width: 100%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 5px;
+         }.caller_name p{
+         margin-left: 15px;
+         color: #fff;
+         font-weight: bold;
+         margin-bottom: 0;
+         }
+         .pin_video_here_and_draggable{
+            width:200px;
+            height:130px;
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 10000;
+            background-color: #000;
+            border-radius: 5px;;
+            
+         }.pin_video_here_also{
+            height: 300px;
+            width: 100%;;
+            background-color: #000;
+            border-radius: 5px;;
          }
       </style>
       <script>
@@ -236,30 +287,32 @@
    </head>
    <body>
       <!---------------- temp-->
+      <!-- <div class="pin_video_here_and_draggable"></div> -->
       <div class="onkar_main_video_outer_container">
          <div class="onkar_users">
             <div class="onkar_users_">
                <div id="onkar_user_close">
                   <i class="fi fi-rr-cross-small"></i>
                </div>
+               <!-- <div class="pin_video_here_also"></div> -->
                <div class="remote_videos" id="remote_videos">
                   <div id="myid" class="onkar_user_video_container">
+                     <div class="caller_name">
+                        <p>You</p>
+                     </div>
+                     <div class="my_video_options">
+                        <div class="video_off" onclick="toggleCamera()">
+                           <i class="fi fi-rr-video-camera"></i>
+                        </div>
+                        <div class="mic_off" onclick="toggleMic()">
+                           <i class="fi fi-rr-volume-mute"></i>
+                        </div>
+                        <!-- <div class="video_pin pin_me">
+                           <i class="fi fi-rr-thumbtack"></i>
+                        </div> -->
+                     </div>
                   </div>
-
-                  <!-- <div id="myid" class="onkar_user_video_container">
-                     </div>
-                     <div id="myid" class="onkar_user_video_container">
-                     
-                     </div>
-                     <div id="myid" class="onkar_user_video_container">
-                     
-                     </div>
-                     <div id="myid" class="onkar_user_video_container">
-                     
-                     </div>
-                     <div id="myid" class="onkar_user_video_container">
-                     
-                     </div> -->
+                 
                </div>
             </div>
          </div>
@@ -356,64 +409,64 @@
          <!-- Dynamic content will be inserted here -->
       </div>
       <script>
-        //  if (window.innerWidth <= 700) {
-        //    document.body.innerHTML = "";
-        //    const messageDiv = document.createElement("div");
-        //    messageDiv.style.display = "flex";
-        //    messageDiv.style.alignItems = "center";
-        //    messageDiv.style.justifyContent = "center";
-        //    messageDiv.style.height = "100vh"; 
-        //    messageDiv.textContent = "INCOMPATIBLE SCREEN SIZE :(";
-        //    document.body.appendChild(messageDiv);
-        //  }
+         //  if (window.innerWidth <= 700) {
+         //    document.body.innerHTML = "";
+         //    const messageDiv = document.createElement("div");
+         //    messageDiv.style.display = "flex";
+         //    messageDiv.style.alignItems = "center";
+         //    messageDiv.style.justifyContent = "center";
+         //    messageDiv.style.height = "100vh"; 
+         //    messageDiv.textContent = "INCOMPATIBLE SCREEN SIZE :(";
+         //    document.body.appendChild(messageDiv);
+         //  }
+          
          
-     
-         function showAlert(message) {
-           var alertElement = document.getElementById('alert');
-           alertElement.innerHTML = message;
-           alertElement.style.display = 'block';
-           setTimeout(function() {
-               alertElement.style.display = 'none';
-           }, 3000);
-         }
-         
-         function init_0(text) {
-           if ($("." + text).text() == 0) {
-               $("." + text).css({
-                   "visibility": "hidden"
-               });
-           } else {
-               $("." + text).css({
-                   "visibility": "visible"
-               });
-           }
-         }
-         
-         function message__() {
-           $(".message_num").text(0);
-           $(".messages_main").toggle(100);
-           init_0("messages_main");
-         }
-         init_0("message_num");
-         $(document).ready(function() {
-           $(".send_sms").on('submit', function(e) {
-               e.preventDefault();
-               var mess = $(".chat-input").val();
-               $(".chatbox-body").append(' <div class="sent_message"><p class="message">' + mess + '</p></div>');
-               $(this)[0].reset();
-               $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
-               sendMessage({
-                   'message': {
-                       collab_id: $(".collab_id").text(),
-                       sender: $(".sender").text(),
-                       sender_name: $(".sender_name").text(),
-                       message: mess,
-         
-                   },
-                   'shape': 'message'
-               });
-           });
-         });
+          function showAlert(message) {
+            var alertElement = document.getElementById('alert');
+            alertElement.innerHTML = message;
+            alertElement.style.display = 'block';
+            setTimeout(function() {
+                alertElement.style.display = 'none';
+            }, 3000);
+          }
+          
+          function init_0(text) {
+            if ($("." + text).text() == 0) {
+                $("." + text).css({
+                    "visibility": "hidden"
+                });
+            } else {
+                $("." + text).css({
+                    "visibility": "visible"
+                });
+            }
+          }
+          
+          function message__() {
+            $(".message_num").text(0);
+            $(".messages_main").toggle(100);
+            init_0("messages_main");
+          }
+          init_0("message_num");
+          $(document).ready(function() {
+            $(".send_sms").on('submit', function(e) {
+                e.preventDefault();
+                var mess = $(".chat-input").val();
+                $(".chatbox-body").append(' <div class="sent_message"><p class="message">' + mess + '</p></div>');
+                $(this)[0].reset();
+                $(".chatbox-body").scrollTop($(".chatbox-body")[0].scrollHeight);
+                sendMessage({
+                    'message': {
+                        collab_id: $(".collab_id").text(),
+                        sender: $(".sender").text(),
+                        sender_name: $(".sender_name").text(),
+                        message: mess,
+          
+                    },
+                    'shape': 'message'
+                });
+            });
+          });
       </script>
       <script>
          function findObjectById(id) {

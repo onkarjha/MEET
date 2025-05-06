@@ -158,17 +158,18 @@ line-height:24px
 	width: 100%;
 	}
 	.tools {
-	border-radius: 5px;
-	border: 1px solid #efefef;
-	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-	position: absolute;
-	left: 20px; /* 10px from the left */
-	top: 50%; /* Center vertically */
-	transform: translateY(-50%); /* Adjust vertically by 50% of the element's height */
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+		border-radius: 5px;
+		border: 1px solid #efefef;
+		box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+		position: absolute;
+		left: 0px;
+		top: 0;
+		
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 100vh;
 	}
 	.tools > div > i {
 	font-size: 15px;
