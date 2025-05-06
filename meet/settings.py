@@ -9,7 +9,7 @@ SECRET_KEY = 'django-insecure-mqy3_=bf^0c92e7cgxe3d*vbq6sy_uay9xj)h@37nhq^31(v3t
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','web-production-c81f.up.railway.app']
 
 
 INSTALLED_APPS = [
@@ -45,7 +45,7 @@ CHANNEL_LAYERS = {
 }
 ROOT_URLCONF = 'meet.urls'
 CSRF_TRUSTED_ORIGINS = [
-    "https://5bcb-115-96-224-29.ngrok-free.app",
+    "https://web-production-c81f.up.railway.app",
 ]
 TEMPLATES = [
     {
