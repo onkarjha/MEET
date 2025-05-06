@@ -4,3 +4,4 @@ whitenoise
 channels
 channels-redis
 daphne
+twisted[tls,http2]
