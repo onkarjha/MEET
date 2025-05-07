@@ -1,1 +1,1 @@
-web: gunicorn meet.asgi
+web: gunicorn meet.wsgi
